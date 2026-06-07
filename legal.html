@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Тарифы, оферта и контакты — Документо</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --bg: #0a0a0f;
+      --surface: #13131a;
+      --surface-2: #1c1c26;
+      --border: rgba(255, 255, 255, 0.08);
+      --text: #f4f4f5;
+      --text-muted: #a1a1aa;
+      --accent: #6366f1;
+      --accent-light: #818cf8;
+      --accent-glow: rgba(99, 102, 241, 0.35);
+      --radius: 12px;
+      --radius-lg: 20px;
+    }
+
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      background: rgba(10, 10, 15, 0.8);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .header-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 64px;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 700;
+      font-size: 1.15rem;
+      text-decoration: none;
+      color: var(--text);
+    }
+
+    .logo-icon {
+      width: 32px;
+      height: 32px;
+      background: linear-gradient(135deg, var(--accent), #a855f7);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.85rem;
+    }
+
+    .back-link {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+
+    .back-link:hover {
+      color: var(--text);
+    }
+
+    main {
+      padding: 120px 0 80px;
+    }
+
+    .page-title {
+      font-size: clamp(1.8rem, 4vw, 2.4rem);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      margin-bottom: 12px;
+    }
+
+    .page-desc {
+      color: var(--text-muted);
+      margin-bottom: 48px;
+    }
+
+    .legal-section {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 32px;
+      margin-bottom: 24px;
+    }
+
+    .legal-section h2 {
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin-bottom: 20px;
+      color: var(--accent-light);
+    }
+
+    .legal-section h3 {
+      font-size: 1rem;
+      font-weight: 600;
+      margin: 20px 0 8px;
+    }
+
+    .legal-section p {
+      color: var(--text-muted);
+      margin-bottom: 12px;
+    }
+
+    .legal-section p:last-child {
+      margin-bottom: 0;
+    }
+
+    .legal-section ul {
+      color: var(--text-muted);
+      margin: 0 0 12px 20px;
+    }
+
+    .legal-section li {
+      margin-bottom: 6px;
+    }
+
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 16px;
+      margin-top: 8px;
+    }
+
+    .pricing-card {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+    }
+
+    .pricing-card.featured {
+      border-color: rgba(99, 102, 241, 0.4);
+      box-shadow: 0 0 24px var(--accent-glow);
+    }
+
+    .pricing-name {
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .pricing-price {
+      font-size: 1.6rem;
+      font-weight: 800;
+      color: var(--accent-light);
+      margin-bottom: 12px;
+    }
+
+    .pricing-price span {
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: var(--text-muted);
+    }
+
+    .pricing-features {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    .pricing-features li {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      padding-left: 20px;
+      position: relative;
+      margin-bottom: 8px;
+    }
+
+    .pricing-features li::before {
+      content: '✓';
+      position: absolute;
+      left: 0;
+      color: var(--accent-light);
+      font-weight: 700;
+    }
+
+    .contacts-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    .contacts-list li {
+      margin-bottom: 10px;
+      color: var(--text-muted);
+    }
+
+    .contacts-list strong {
+      color: var(--text);
+      font-weight: 600;
+    }
+
+    .contacts-list a {
+      color: var(--accent-light);
+      text-decoration: none;
+    }
+
+    .contacts-list a:hover {
+      text-decoration: underline;
+    }
+
+    footer {
+      padding: 32px 0;
+      border-top: 1px solid var(--border);
+    }
+
+    .footer-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .footer-copy {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 24px;
+    }
+
+    .footer-links a {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .footer-links a:hover {
+      color: var(--text);
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="container header-inner">
+      <a href="index.html" class="logo">
+        <div class="logo-icon">Д</div>
+        Документо
+      </a>
+      <a href="index.html" class="back-link">← На главную</a>
+    </div>
+  </header>
+
+  <main>
+    <div class="container">
+      <h1 class="page-title">Правовая информация</h1>
+      <p class="page-desc">Тарифы, условия оказания услуг, публичная оферта и контактные данные исполнителя.</p>
+
+      <section class="legal-section" id="tariffs">
+        <h2>1. Тарифы и цены</h2>
+        <div class="pricing-grid">
+          <div class="pricing-card">
+            <div class="pricing-name">Бесплатный план</div>
+            <div class="pricing-price">0 ₽ <span>/ месяц</span></div>
+            <ul class="pricing-features">
+              <li>3 документа в месяц</li>
+              <li>Договоры, акты и КП</li>
+              <li>Скачивание в PDF</li>
+            </ul>
+          </div>
+          <div class="pricing-card featured">
+            <div class="pricing-name">Про план</div>
+            <div class="pricing-price">499 ₽ <span>/ месяц</span></div>
+            <ul class="pricing-features">
+              <li>Безлимитные документы</li>
+              <li>Все типы документов</li>
+              <li>Приоритетная поддержка</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section class="legal-section" id="order">
+        <h2>2. Как получить заказ</h2>
+        <p>После оплаты доступ к выбранному тарифному плану открывается автоматически в личном кабинете на сайте dokumento.</p>
+        <p>Все документы генерируются онлайн и становятся доступны сразу после оформления подписки или регистрации. Дополнительных действий для активации доступа не требуется.</p>
+        <p>Оплата производится через платёжные системы, доступные на сайте. Моментом оплаты считается поступление денежных средств на расчётный счёт исполнителя.</p>
+      </section>
+
+      <section class="legal-section" id="oferta">
+        <h2>3. Публичная оферта</h2>
+        <p>Настоящий документ является официальным предложением (публичной офертой) Ефимова Алексея Олеговича (далее — Исполнитель) заключить договор на оказание информационных услуг с любым физическим лицом (далее — Заказчик) на условиях, изложенных ниже.</p>
+
+        <h3>3.1. Предмет договора</h3>
+        <p>Исполнитель обязуется предоставить Заказчику доступ к онлайн-сервису «Документо» для автоматизированной генерации документов (договоров, актов, коммерческих предложений), а Заказчик обязуется оплатить услуги в соответствии с выбранным тарифным планом.</p>
+
+        <h3>3.2. Порядок заключения договора</h3>
+        <p>Договор считается заключённым с момента акцепта оферты Заказчиком. Акцептом оферты является регистрация на сайте, оплата услуг или фактическое использование сервиса.</p>
+
+        <h3>3.3. Стоимость услуг</h3>
+        <p>Стоимость услуг определяется тарифами, размещёнными в разделе «Тарифы и цены» настоящей страницы. Исполнитель вправе изменять тарифы, уведомив Заказчика путём публикации новых условий на сайте.</p>
+
+        <h3>3.4. Порядок оказания услуг</h3>
+        <p>Услуги оказываются в электронном виде через сеть Интернет. Доступ к функционалу сервиса предоставляется после регистрации и/или оплаты в соответствии с выбранным тарифом.</p>
+
+        <h3>3.5. Права и обязанности сторон</h3>
+        <p>Исполнитель обязуется обеспечить работоспособность сервиса и предоставить Заказчику доступ к заявленному функционалу. Заказчик обязуется предоставлять достоверные данные при регистрации и не использовать сервис в противоправных целях.</p>
+
+        <h3>3.6. Ответственность</h3>
+        <p>Исполнитель не несёт ответственности за содержание документов, сгенерированных Заказчиком, и рекомендует проверять их перед использованием. Сервис предоставляет шаблоны информационного характера и не заменяет профессиональную юридическую консультацию.</p>
+
+        <h3>3.7. Возврат средств</h3>
+        <p>Возврат оплаты за неоказанные услуги осуществляется в соответствии с законодательством Российской Федерации о защите прав потребителей. Для оформления возврата Заказчик направляет обращение на контактный email Исполнителя.</p>
+
+        <h3>3.8. Заключительные положения</h3>
+        <p>К отношениям сторон применяется законодательство Российской Федерации. Все споры разрешаются путём переговоров, а при недостижении согласия — в судебном порядке по месту нахождения Исполнителя.</p>
+      </section>
+
+      <section class="legal-section" id="contacts">
+        <h2>4. Контакты и реквизиты</h2>
+        <ul class="contacts-list">
+          <li><strong>ФИО:</strong> Ефимов Алексей Олегович</li>
+          <li><strong>ИНН:</strong> 026829849907</li>
+          <li><strong>Email:</strong> <a href="mailto:efimoff.iq@gmail.com">efimoff.iq@gmail.com</a></li>
+          <li><strong>Статус:</strong> Самозанятый</li>
+        </ul>
+      </section>
+    </div>
+  </main>
+
+  <footer>
+    <div class="container footer-inner">
+      <a href="index.html" class="logo">
+        <div class="logo-icon">Д</div>
+        Документо
+      </a>
+      <p class="footer-copy">© 2026 Документо. Все права защищены.</p>
+      <div class="footer-links">
+        <a href="index.html">Главная</a>
+        <a href="legal.html">Правовая информация</a>
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>
