@@ -1178,6 +1178,7 @@
           <h2>Ваш документ готов</h2>
           <div class="document-toolbar-actions">
             <button type="button" class="btn btn-ghost" id="btn-edit">Изменить данные</button>
+            <button type="button" class="btn btn-ghost" id="btn-create-act" style="display:none">Создать акт по договору</button>
             <button type="button" class="btn btn-primary" id="btn-print">Скачать PDF</button>
           </div>
         </div>
@@ -1324,7 +1325,7 @@
         <form id="form-contract">
           <div class="form-grid">
             <div class="form-group">
-              <label for="c-executor">ФИО исполнителя</label>
+              <label for="c-executor">ФИО исполнителя <span style="color:var(--accent-light);font-size:0.75rem;display:none" id="req-hint">· сохранено</span></label>
               <input type="text" id="c-executor" name="executor" placeholder="Иванов Иван Иванович" required>
             </div>
             <div class="form-group">
@@ -1946,6 +1947,81 @@
           printWindow.print();
         }, 500);
       }
+
+      // === REQUISITES SAVE ===
+      var REQ_KEY = 'dokumento_req';
+
+      function saveRequisites(executor, city) {
+        if (executor) localStorage.setItem(REQ_KEY, JSON.stringify({ executor: executor, city: city || '' }));
+      }
+
+      function loadRequisites() {
+        try { return JSON.parse(localStorage.getItem(REQ_KEY)) || {}; } catch(e) { return {}; }
+      }
+
+      function fillRequisites() {
+        var req = loadRequisites();
+        if (!req.executor) return;
+        var fields = ['c-executor','a-executor','k-executor'];
+        fields.forEach(function(id) {
+          var el = document.getElementById(id);
+          if (el && !el.value) el.value = req.executor;
+        });
+        var cityEl = document.getElementById('c-city');
+        if (cityEl && !cityEl.value && req.city) cityEl.value = req.city;
+        var hint = document.getElementById('req-hint');
+        if (hint) hint.style.display = 'inline';
+      }
+
+      fillRequisites();
+
+      // === DOC COUNTER ===
+      var docCounterKey = 'dokumento_doc_num';
+      function nextDocNum() {
+        var n = parseInt(localStorage.getItem(docCounterKey) || '0', 10) + 1;
+        localStorage.setItem(docCounterKey, String(n));
+        return String(n);
+      }
+
+      // Override docNum to use persistent counter
+      function docNum() { return nextDocNum(); }
+
+      // === CONTRACT → ACT LINK ===
+      var lastContractData = null;
+
+      document.getElementById('btn-create-act').addEventListener('click', function() {
+        if (!lastContractData) return;
+        // Fill act form with contract data
+        var aExec = document.getElementById('a-executor');
+        var aClient = document.getElementById('a-client');
+        var aWork = document.getElementById('a-work');
+        var aAmount = document.getElementById('a-amount');
+        if (aExec) aExec.value = lastContractData.executor || '';
+        if (aClient) aClient.value = lastContractData.client || '';
+        if (aWork) aWork.value = lastContractData.service || '';
+        if (aAmount) aAmount.value = lastContractData.amount || '';
+        // Switch to act tab
+        switchGeneratorTab('act');
+        openGeneratorModal();
+      });
+
+      // === PATCH generate() to save requisites and track contract data ===
+      var _origGenerate = generate;
+      generate = async function() {
+        var form = document.getElementById('form-' + activeTab);
+        if (form && form.reportValidity()) {
+          var data = Object.fromEntries(new FormData(form));
+          if (activeTab === 'contract') {
+            lastContractData = data;
+            saveRequisites(data.executor, data.city);
+            document.getElementById('btn-create-act').style.display = 'inline-flex';
+          } else {
+            document.getElementById('btn-create-act').style.display = 'none';
+            if (data.executor) saveRequisites(data.executor, '');
+          }
+        }
+        return _origGenerate.apply(this, arguments);
+      };
     })();
   </script>
 
