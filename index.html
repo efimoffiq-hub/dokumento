@@ -7,6 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <style>
     *, *::before, *::after {
       box-sizing: border-box;
@@ -1304,9 +1305,16 @@
       const authPanels = document.querySelectorAll('#auth-modal .tab-panel');
 
       let activeTab = 'contract';
+      let lastGeneratedTab = 'contract';
       let activeAuthTab = 'login';
       let currentUser = null;
       let openGeneratorAfterAuth = false;
+
+      const PDF_FILENAMES = {
+        contract: 'договор.pdf',
+        act: 'акт.pdf',
+        kp: 'кп.pdf',
+      };
 
       const today = new Date();
       const dateStr = formatDateRu(today);
@@ -1352,9 +1360,7 @@
       document.getElementById('btn-auth-submit').addEventListener('click', submitAuth);
       document.getElementById('btn-logout').addEventListener('click', logout);
       document.getElementById('btn-generate').addEventListener('click', generate);
-      document.getElementById('btn-print').addEventListener('click', function () {
-        window.print();
-      });
+      document.getElementById('btn-print').addEventListener('click', downloadPdf);
       document.getElementById('btn-edit').addEventListener('click', openGeneratorModal);
 
       initAuth();
@@ -1593,6 +1599,7 @@
             html = buildKp(data);
           }
 
+          lastGeneratedTab = activeTab;
           output.innerHTML = html;
           resultSection.classList.add('is-visible');
           closeGeneratorModal();
@@ -1773,6 +1780,29 @@
         var div = document.createElement('div');
         div.textContent = str;
         return div.innerHTML;
+      }
+
+      function downloadPdf() {
+        if (!output.innerHTML.trim()) return;
+
+        var btn = document.getElementById('btn-print');
+        var label = btn.textContent;
+        btn.disabled = true;
+        btn.textContent = 'Генерация PDF...';
+
+        html2pdf().set({
+          margin: 15,
+          filename: PDF_FILENAMES[lastGeneratedTab] || 'документ.pdf',
+          image: { type: 'jpeg', quality: 0.98 },
+          html2canvas: { scale: 2, useCORS: true },
+          jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+        }).from(output).save().then(function () {
+          btn.disabled = false;
+          btn.textContent = label;
+        }).catch(function () {
+          btn.disabled = false;
+          btn.textContent = label;
+        });
       }
     })();
   </script>
