@@ -20,9 +20,16 @@ db.exec(`
     password_hash TEXT NOT NULL,
     documents_count INTEGER NOT NULL DEFAULT 0,
     documents_month TEXT NOT NULL DEFAULT ''
-  )
+  );
+
+  CREATE TABLE IF NOT EXISTS documents_count (
+    ip_address TEXT PRIMARY KEY,
+    documents_count INTEGER NOT NULL DEFAULT 0,
+    documents_month TEXT NOT NULL DEFAULT ''
+  );
 `);
 
+app.set('trust proxy', 1);
 app.use(cors());
 app.use(express.json());
 app.use(express.static(__dirname));
@@ -32,21 +39,47 @@ function currentMonth() {
   return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
 }
 
-function getUserById(id) {
-  return db.prepare('SELECT id, email, documents_count, documents_month FROM users WHERE id = ?').get(id);
-}
-
-function resetCountIfNewMonth(user) {
-  const month = currentMonth();
-  if (user.documents_month !== month) {
-    db.prepare('UPDATE users SET documents_count = 0, documents_month = ? WHERE id = ?').run(month, user.id);
-    return { ...user, documents_count: 0, documents_month: month };
+function getClientIp(req) {
+  const forwarded = req.headers['x-forwarded-for'];
+  if (forwarded) {
+    return forwarded.split(',')[0].trim();
   }
-  return user;
+  return req.ip || req.socket.remoteAddress || 'unknown';
 }
 
-function userPayload(user) {
-  const used = user.documents_count;
+function getUserById(id) {
+  return db.prepare('SELECT id, email FROM users WHERE id = ?').get(id);
+}
+
+function getIpRecord(ip) {
+  let record = db.prepare('SELECT * FROM documents_count WHERE ip_address = ?').get(ip);
+  if (!record) {
+    db.prepare(
+      'INSERT INTO documents_count (ip_address, documents_count, documents_month) VALUES (?, 0, ?)'
+    ).run(ip, currentMonth());
+    record = { ip_address: ip, documents_count: 0, documents_month: currentMonth() };
+  }
+  return record;
+}
+
+function resetIpCountIfNewMonth(record) {
+  const month = currentMonth();
+  if (record.documents_month !== month) {
+    db.prepare(
+      'UPDATE documents_count SET documents_count = 0, documents_month = ? WHERE ip_address = ?'
+    ).run(month, record.ip_address);
+    return { ...record, documents_count: 0, documents_month: month };
+  }
+  return record;
+}
+
+function getIpDocumentStats(req) {
+  const ip = getClientIp(req);
+  return resetIpCountIfNewMonth(getIpRecord(ip));
+}
+
+function userPayload(user, ipRecord) {
+  const used = ipRecord.documents_count;
   return {
     id: user.id,
     email: user.email,
@@ -69,7 +102,7 @@ function authMiddleware(req, res, next) {
     if (!user) {
       return res.status(401).json({ error: 'Пользователь не найден' });
     }
-    req.user = resetCountIfNewMonth(user);
+    req.user = user;
     next();
   } catch {
     return res.status(401).json({ error: 'Недействительный токен' });
@@ -103,9 +136,10 @@ app.post('/api/register', async (req, res) => {
     ).run(email.toLowerCase(), passwordHash, currentMonth());
 
     const user = getUserById(result.lastInsertRowid);
+    const ipRecord = getIpDocumentStats(req);
     const token = jwt.sign({ userId: user.id }, JWT_SECRET, { expiresIn: '7d' });
 
-    res.status(201).json({ token, user: userPayload(user) });
+    res.status(201).json({ token, user: userPayload(user, ipRecord) });
   } catch (err) {
     console.error('Register error:', err);
     res.status(500).json({ error: 'Ошибка сервера' });
@@ -129,30 +163,35 @@ app.post('/api/login', async (req, res) => {
     return res.status(401).json({ error: 'Неверный email или пароль' });
   }
 
-  const freshUser = resetCountIfNewMonth(user);
+  const freshUser = getUserById(user.id);
+  const ipRecord = getIpDocumentStats(req);
   const token = jwt.sign({ userId: freshUser.id }, JWT_SECRET, { expiresIn: '7d' });
 
-  res.json({ token, user: userPayload(freshUser) });
+  res.json({ token, user: userPayload(freshUser, ipRecord) });
 });
 
 app.get('/api/me', authMiddleware, (req, res) => {
-  res.json({ user: userPayload(req.user) });
+  const ipRecord = getIpDocumentStats(req);
+  res.json({ user: userPayload(req.user, ipRecord) });
 });
 
 app.post('/api/documents/count', authMiddleware, (req, res) => {
-  const user = req.user;
+  const ipRecord = getIpDocumentStats(req);
 
-  if (user.documents_count >= FREE_LIMIT) {
+  if (ipRecord.documents_count >= FREE_LIMIT) {
     return res.status(403).json({
       error: 'Лимит бесплатных документов исчерпан',
-      used: user.documents_count,
+      used: ipRecord.documents_count,
       remaining: 0,
       limit: FREE_LIMIT,
     });
   }
 
-  const newCount = user.documents_count + 1;
-  db.prepare('UPDATE users SET documents_count = ? WHERE id = ?').run(newCount, user.id);
+  const newCount = ipRecord.documents_count + 1;
+  db.prepare('UPDATE documents_count SET documents_count = ? WHERE ip_address = ?').run(
+    newCount,
+    ipRecord.ip_address
+  );
 
   res.json({
     used: newCount,

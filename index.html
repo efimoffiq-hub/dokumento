@@ -7,7 +7,6 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <style>
     *, *::before, *::after {
       box-sizing: border-box;
@@ -1782,38 +1781,43 @@
         return div.innerHTML;
       }
 
-      async function downloadPDF() {
+      function downloadPDF() {
         var element = document.getElementById('generated-document');
-        if (!element || !element.innerText.trim()) return;
+        if (!element || !element.innerHTML.trim()) return;
 
-        var btn = document.getElementById('btn-print');
-        var label = btn.textContent;
-        btn.disabled = true;
-        btn.textContent = 'Генерация PDF...';
+        var printWindow = window.open('', '_blank');
+        if (!printWindow) return;
 
-        try {
-          var jsPDF = window.jspdf.jsPDF;
-          var pdf = new jsPDF('p', 'mm', 'a4');
-          var text = element.innerText;
-          var lines = pdf.splitTextToSize(text, 180);
-          var y = 20;
-
-          pdf.setFontSize(12);
-
-          lines.forEach(function (line) {
-            if (y > 280) {
-              pdf.addPage();
-              y = 20;
-            }
-            pdf.text(line, 15, y);
-            y += 7;
-          });
-
-          pdf.save(PDF_FILENAMES[lastGeneratedTab] || 'документ.pdf');
-        } finally {
-          btn.disabled = false;
-          btn.textContent = label;
-        }
+        printWindow.document.write(
+          '<!DOCTYPE html>'
+          + '<html>'
+          + '<head>'
+          + '<meta charset="UTF-8">'
+          + '<title>' + (PDF_FILENAMES[lastGeneratedTab] || 'документ.pdf') + '</title>'
+          + '<style>'
+          + 'body { font-family: Arial, sans-serif; padding: 40px; color: #000; font-size: 14px; line-height: 1.8; }'
+          + '.doc-header { text-align: center; margin-bottom: 32px; padding-bottom: 24px; border-bottom: 2px solid #6366f1; }'
+          + '.doc-header h1 { font-size: 18px; font-weight: 700; text-transform: uppercase; }'
+          + '.doc-meta { text-align: right; margin-bottom: 28px; }'
+          + '.doc-section { margin-bottom: 20px; }'
+          + '.doc-section h2 { font-size: 14px; font-weight: 700; margin-bottom: 10px; }'
+          + '.doc-section p, .doc-parties p { text-align: justify; margin-bottom: 8px; }'
+          + '.doc-signatures { display: flex; justify-content: space-between; margin-top: 48px; gap: 40px; }'
+          + '.doc-sig-line { border-bottom: 1px solid #333; margin-top: 40px; margin-bottom: 4px; }'
+          + '.doc-kp-header { background: #6366f1; color: #fff; padding: 32px; margin: -40px -40px 32px; }'
+          + '.doc-kp-header h1, .doc-kp-header p { color: #fff; }'
+          + '.doc-kp-price { background: #f4f4f5; border-left: 4px solid #6366f1; padding: 20px 24px; margin: 24px 0; }'
+          + '.doc-kp-price .price-value { font-size: 28px; font-weight: 800; color: #6366f1; }'
+          + '@media print { body { padding: 20px; } }'
+          + '</style>'
+          + '</head>'
+          + '<body>' + element.innerHTML + '</body>'
+          + '</html>'
+        );
+        printWindow.document.close();
+        setTimeout(function () {
+          printWindow.print();
+        }, 500);
       }
     })();
   </script>
