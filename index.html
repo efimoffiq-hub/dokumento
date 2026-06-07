@@ -1,0 +1,1459 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Документо — договоры, акты и КП для фрилансеров</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --bg: #0a0a0f;
+      --surface: #13131a;
+      --surface-2: #1c1c26;
+      --border: rgba(255, 255, 255, 0.08);
+      --text: #f4f4f5;
+      --text-muted: #a1a1aa;
+      --accent: #6366f1;
+      --accent-light: #818cf8;
+      --accent-glow: rgba(99, 102, 241, 0.35);
+      --green: #22c55e;
+      --radius: 12px;
+      --radius-lg: 20px;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .container {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* Header */
+    header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      background: rgba(10, 10, 15, 0.8);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .header-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 64px;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 700;
+      font-size: 1.15rem;
+      text-decoration: none;
+      color: var(--text);
+    }
+
+    .logo-icon {
+      width: 32px;
+      height: 32px;
+      background: linear-gradient(135deg, var(--accent), #a855f7);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.85rem;
+    }
+
+    nav {
+      display: flex;
+      align-items: center;
+      gap: 32px;
+    }
+
+    nav a {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+
+    nav a:hover {
+      color: var(--text);
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 10px 20px;
+      border-radius: 10px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      text-decoration: none;
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #fff;
+      box-shadow: 0 0 24px var(--accent-glow);
+    }
+
+    .btn-primary:hover {
+      background: var(--accent-light);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 32px var(--accent-glow);
+    }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--text-muted);
+      border: 1px solid var(--border);
+    }
+
+    .btn-ghost:hover {
+      color: var(--text);
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .btn-lg {
+      padding: 14px 28px;
+      font-size: 1rem;
+      border-radius: var(--radius);
+    }
+
+    /* Hero */
+    .hero {
+      padding: 140px 0 80px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: -200px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 800px;
+      height: 600px;
+      background: radial-gradient(ellipse, var(--accent-glow) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .hero-content {
+      position: relative;
+      text-align: center;
+      max-width: 720px;
+      margin: 0 auto;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 14px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: var(--text-muted);
+      margin-bottom: 24px;
+    }
+
+    .badge-dot {
+      width: 6px;
+      height: 6px;
+      background: var(--green);
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+
+    .hero h1 {
+      font-size: clamp(2.2rem, 5vw, 3.5rem);
+      font-weight: 800;
+      line-height: 1.15;
+      letter-spacing: -0.03em;
+      margin-bottom: 20px;
+    }
+
+    .hero h1 span {
+      background: linear-gradient(135deg, var(--accent-light), #c084fc);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero p {
+      font-size: 1.15rem;
+      color: var(--text-muted);
+      max-width: 540px;
+      margin: 0 auto 36px;
+    }
+
+    .hero-actions {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .hero-note {
+      margin-top: 16px;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    /* Preview card */
+    .hero-preview {
+      margin-top: 64px;
+      position: relative;
+    }
+
+    .preview-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 32px;
+      max-width: 640px;
+      margin: 0 auto;
+      text-align: left;
+      box-shadow: 0 24px 80px rgba(0, 0, 0, 0.5);
+    }
+
+    .preview-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 24px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .preview-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+
+    .preview-dot:nth-child(1) { background: #ef4444; }
+    .preview-dot:nth-child(2) { background: #eab308; }
+    .preview-dot:nth-child(3) { background: #22c55e; }
+
+    .preview-title {
+      margin-left: 8px;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .preview-doc {
+      font-size: 0.95rem;
+      line-height: 1.8;
+      color: var(--text-muted);
+    }
+
+    .preview-doc strong {
+      color: var(--text);
+      font-weight: 600;
+    }
+
+    .preview-doc .highlight {
+      background: rgba(99, 102, 241, 0.15);
+      color: var(--accent-light);
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+
+    /* Features */
+    .features {
+      padding: 100px 0;
+    }
+
+    .section-label {
+      text-align: center;
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--accent-light);
+      margin-bottom: 12px;
+    }
+
+    .section-title {
+      text-align: center;
+      font-size: clamp(1.6rem, 3vw, 2.2rem);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 16px;
+    }
+
+    .section-desc {
+      text-align: center;
+      color: var(--text-muted);
+      max-width: 480px;
+      margin: 0 auto 56px;
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 20px;
+    }
+
+    .feature-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 32px;
+      transition: border-color 0.2s, transform 0.2s;
+    }
+
+    .feature-card:hover {
+      border-color: rgba(99, 102, 241, 0.3);
+      transform: translateY(-2px);
+    }
+
+    .feature-icon {
+      width: 48px;
+      height: 48px;
+      background: rgba(99, 102, 241, 0.12);
+      border-radius: var(--radius);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.4rem;
+      margin-bottom: 20px;
+    }
+
+    .feature-card h3 {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .feature-card p {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      line-height: 1.7;
+    }
+
+    /* Steps */
+    .steps {
+      padding: 100px 0;
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .steps-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 32px;
+      margin-top: 56px;
+    }
+
+    .step {
+      text-align: center;
+    }
+
+    .step-num {
+      width: 48px;
+      height: 48px;
+      background: var(--accent);
+      color: #fff;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 1.1rem;
+      margin: 0 auto 20px;
+    }
+
+    .step h3 {
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .step p {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+    }
+
+    /* CTA */
+    .cta {
+      padding: 100px 0;
+      text-align: center;
+    }
+
+    .cta-box {
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(168, 85, 247, 0.1));
+      border: 1px solid rgba(99, 102, 241, 0.25);
+      border-radius: var(--radius-lg);
+      padding: 64px 32px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .cta-box::before {
+      content: '';
+      position: absolute;
+      top: -100px;
+      right: -100px;
+      width: 300px;
+      height: 300px;
+      background: radial-gradient(circle, var(--accent-glow), transparent 70%);
+      pointer-events: none;
+    }
+
+    .cta-box h2 {
+      font-size: clamp(1.6rem, 3vw, 2.2rem);
+      font-weight: 700;
+      margin-bottom: 12px;
+      position: relative;
+    }
+
+    .cta-box p {
+      color: var(--text-muted);
+      margin-bottom: 32px;
+      position: relative;
+    }
+
+    /* Footer */
+    footer {
+      padding: 32px 0;
+      border-top: 1px solid var(--border);
+    }
+
+    .footer-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .footer-copy {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 24px;
+    }
+
+    .footer-links a {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .footer-links a:hover {
+      color: var(--text);
+    }
+
+    /* Mobile nav */
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 32px;
+    }
+
+    @media (max-width: 768px) {
+      .nav-links {
+        display: none;
+      }
+
+      .hero {
+        padding: 120px 0 60px;
+      }
+
+      .preview-card {
+        padding: 20px;
+      }
+
+      .cta-box {
+        padding: 48px 24px;
+      }
+
+      .modal {
+        max-height: 95vh;
+      }
+
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .tabs {
+        flex-wrap: wrap;
+      }
+    }
+
+    /* Modal */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 200;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(8px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.25s, visibility 0.25s;
+    }
+
+    .modal-overlay.is-open {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .modal {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      width: 100%;
+      max-width: 560px;
+      max-height: 90vh;
+      overflow-y: auto;
+      padding: 32px;
+      position: relative;
+      transform: translateY(16px);
+      transition: transform 0.25s;
+      box-shadow: 0 24px 80px rgba(0, 0, 0, 0.6);
+    }
+
+    .modal-overlay.is-open .modal {
+      transform: translateY(0);
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      width: 36px;
+      height: 36px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--surface-2);
+      color: var(--text-muted);
+      font-size: 1.2rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: color 0.2s, border-color 0.2s;
+    }
+
+    .modal-close:hover {
+      color: var(--text);
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .modal-title {
+      font-size: 1.35rem;
+      font-weight: 700;
+      margin-bottom: 4px;
+      padding-right: 40px;
+    }
+
+    .modal-subtitle {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      margin-bottom: 24px;
+    }
+
+    /* Tabs */
+    .tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 24px;
+      background: var(--surface-2);
+      padding: 4px;
+      border-radius: 10px;
+    }
+
+    .tab {
+      flex: 1;
+      padding: 10px 12px;
+      border: none;
+      border-radius: 8px;
+      background: transparent;
+      color: var(--text-muted);
+      font-family: inherit;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .tab:hover {
+      color: var(--text);
+    }
+
+    .tab.is-active {
+      background: var(--accent);
+      color: #fff;
+      box-shadow: 0 2px 12px var(--accent-glow);
+    }
+
+    .tab-panel {
+      display: none;
+    }
+
+    .tab-panel.is-active {
+      display: block;
+    }
+
+    /* Forms */
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .form-group.full {
+      grid-column: 1 / -1;
+    }
+
+    .form-group label {
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: var(--text-muted);
+    }
+
+    .form-group input,
+    .form-group textarea {
+      padding: 10px 14px;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 0.9rem;
+      transition: border-color 0.2s;
+    }
+
+    .form-group input:focus,
+    .form-group textarea:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+
+    .form-group textarea {
+      resize: vertical;
+      min-height: 80px;
+    }
+
+    .form-group input::placeholder,
+    .form-group textarea::placeholder {
+      color: rgba(161, 161, 170, 0.5);
+    }
+
+    .btn-generate {
+      width: 100%;
+      margin-top: 24px;
+      padding: 14px;
+      font-size: 1rem;
+    }
+
+    /* Document result */
+    .document-result {
+      display: none;
+      padding: 80px 0;
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+    }
+
+    .document-result.is-visible {
+      display: block;
+    }
+
+    .document-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .document-toolbar h2 {
+      font-size: 1.25rem;
+      font-weight: 700;
+    }
+
+    .document-toolbar-actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .document-paper {
+      background: #fff;
+      color: #1a1a1a;
+      border-radius: var(--radius);
+      padding: 56px 64px;
+      max-width: 800px;
+      margin: 0 auto;
+      box-shadow: 0 8px 40px rgba(0, 0, 0, 0.3);
+      font-size: 14px;
+      line-height: 1.7;
+    }
+
+    /* Document styles (print-friendly) */
+    .doc-header {
+      text-align: center;
+      margin-bottom: 32px;
+      padding-bottom: 24px;
+      border-bottom: 2px solid #6366f1;
+    }
+
+    .doc-header h1 {
+      font-size: 18px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 4px;
+      color: #1a1a1a;
+    }
+
+    .doc-header .doc-num {
+      font-size: 13px;
+      color: #666;
+    }
+
+    .doc-meta {
+      text-align: right;
+      margin-bottom: 28px;
+      color: #444;
+    }
+
+    .doc-section {
+      margin-bottom: 20px;
+    }
+
+    .doc-section h2 {
+      font-size: 14px;
+      font-weight: 700;
+      margin-bottom: 10px;
+      color: #1a1a1a;
+    }
+
+    .doc-section p {
+      text-align: justify;
+      margin-bottom: 8px;
+      color: #333;
+    }
+
+    .doc-parties {
+      margin-bottom: 28px;
+    }
+
+    .doc-parties p {
+      margin-bottom: 6px;
+      color: #333;
+    }
+
+    .doc-signatures {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 48px;
+      gap: 40px;
+    }
+
+    .doc-sig-block {
+      flex: 1;
+    }
+
+    .doc-sig-block p {
+      margin-bottom: 4px;
+      color: #333;
+      font-size: 13px;
+    }
+
+    .doc-sig-line {
+      border-bottom: 1px solid #333;
+      margin-top: 40px;
+      margin-bottom: 4px;
+    }
+
+    /* KP specific */
+    .doc-kp-header {
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      color: #fff;
+      padding: 40px;
+      margin: -56px -64px 32px;
+      border-radius: var(--radius) var(--radius) 0 0;
+    }
+
+    .doc-kp-header h1 {
+      font-size: 24px;
+      font-weight: 800;
+      margin-bottom: 8px;
+      color: #fff;
+    }
+
+    .doc-kp-header p {
+      opacity: 0.85;
+      font-size: 14px;
+      color: #fff;
+    }
+
+    .doc-kp-price {
+      background: #f4f4f5;
+      border-left: 4px solid #6366f1;
+      padding: 20px 24px;
+      margin: 24px 0;
+      border-radius: 0 8px 8px 0;
+    }
+
+    .doc-kp-price .price-label {
+      font-size: 12px;
+      color: #666;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 4px;
+    }
+
+    .doc-kp-price .price-value {
+      font-size: 28px;
+      font-weight: 800;
+      color: #6366f1;
+    }
+
+    .doc-kp-footer {
+      margin-top: 32px;
+      padding-top: 24px;
+      border-top: 1px solid #e4e4e7;
+      display: flex;
+      justify-content: space-between;
+      color: #666;
+      font-size: 13px;
+    }
+
+    /* Print */
+    @media print {
+      header,
+      main > section:not(.document-result),
+      footer,
+      .modal-overlay {
+        display: none !important;
+      }
+
+      .document-result {
+        display: block !important;
+        padding: 0;
+        background: #fff;
+        border: none;
+      }
+
+      .document-toolbar {
+        display: none !important;
+      }
+
+      .document-paper {
+        box-shadow: none;
+        border-radius: 0;
+        padding: 0;
+        max-width: 100%;
+        margin: 0;
+      }
+
+      .doc-kp-header {
+        margin: 0 0 32px;
+        border-radius: 0;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .document-paper {
+        padding: 32px 24px;
+      }
+
+      .doc-kp-header {
+        margin: -32px -24px 24px;
+        padding: 28px 24px;
+      }
+
+      .doc-signatures {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="container header-inner">
+      <a href="#" class="logo">
+        <div class="logo-icon">Д</div>
+        Документо
+      </a>
+      <nav>
+        <div class="nav-links">
+          <a href="#features">Возможности</a>
+          <a href="#how">Как это работает</a>
+        </div>
+        <button type="button" class="btn btn-primary js-open-generator">Попробовать бесплатно</button>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="container">
+        <div class="hero-content">
+          <div class="badge">
+            <span class="badge-dot"></span>
+            Для фрилансеров и самозанятых
+          </div>
+          <h1>Договоры, акты и&nbsp;КП <span>за&nbsp;2&nbsp;минуты</span></h1>
+          <p>Заполните форму — получите готовый документ в PDF. Без юриста, без шаблонов из интернета, без головной боли.</p>
+          <div class="hero-actions">
+            <button type="button" class="btn btn-primary btn-lg js-open-generator">Попробовать бесплатно</button>
+            <a href="#how" class="btn btn-ghost btn-lg">Как это работает</a>
+          </div>
+          <p class="hero-note">Бесплатно 3 документа в месяц · Без привязки карты</p>
+        </div>
+
+        <div class="hero-preview">
+          <div class="preview-card">
+            <div class="preview-header">
+              <span class="preview-dot"></span>
+              <span class="preview-dot"></span>
+              <span class="preview-dot"></span>
+              <span class="preview-title">договор_оказания_услуг.pdf</span>
+            </div>
+            <div class="preview-doc">
+              <strong>ДОГОВОР № 47</strong> на оказание услуг<br><br>
+              г. Москва, «07» июня 2026 г.<br><br>
+              <strong>Исполнитель:</strong> <span class="highlight">Иванов И.И., самозанятый</span><br>
+              <strong>Заказчик:</strong> ООО «Ромашка»<br><br>
+              Предмет: разработка лендинга — <span class="highlight">85 000 ₽</span><br>
+              Срок: до 30.06.2026
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="features" id="features">
+      <div class="container">
+        <p class="section-label">Возможности</p>
+        <h2 class="section-title">Всё для работы с клиентами</h2>
+        <p class="section-desc">Три типа документов, которые нужны каждому фрилансеру — в одном сервисе.</p>
+
+        <div class="features-grid">
+          <div class="feature-card">
+            <div class="feature-icon">📄</div>
+            <h3>Договоры</h3>
+            <p>Договор оказания услуг, подряда, авторского заказа. С реквизитами, сроками, оплатой и ответственностью сторон.</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">✅</div>
+            <h3>Акты</h3>
+            <p>Акт выполненных работ или оказанных услуг. Автоматически подтягивает данные из договора — не нужно переписывать вручную.</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">💼</div>
+            <h3>Коммерческие предложения</h3>
+            <p>Красивое КП с описанием услуг, сроками и стоимостью. Отправьте клиенту ссылку или скачайте PDF.</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">⚡</div>
+            <h3>Быстро и просто</h3>
+            <p>Ответьте на несколько вопросов — документ готов. Не нужно разбираться в юридических формулировках.</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">🔒</div>
+            <h3>Юридически корректно</h3>
+            <p>Шаблоны проверены юристами. Учтены требования для самозанятых, ИП и физлиц.</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">📥</div>
+            <h3>PDF и отправка</h3>
+            <p>Скачайте готовый PDF или отправьте клиенту по ссылке. Все документы хранятся в личном кабинете.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="steps" id="how">
+      <div class="container">
+        <p class="section-label">Как это работает</p>
+        <h2 class="section-title">Три шага до готового документа</h2>
+        <p class="section-desc">Никаких сложных настроек — только то, что нужно для работы.</p>
+
+        <div class="steps-grid">
+          <div class="step">
+            <div class="step-num">1</div>
+            <h3>Выберите тип документа</h3>
+            <p>Договор, акт или коммерческое предложение — у каждого свой простой мастер.</p>
+          </div>
+          <div class="step">
+            <div class="step-num">2</div>
+            <h3>Заполните данные</h3>
+            <p>Ваши реквизиты, данные клиента, сумма и сроки. Сервис подставит всё в шаблон.</p>
+          </div>
+          <div class="step">
+            <div class="step-num">3</div>
+            <h3>Скачайте или отправьте</h3>
+            <p>Готовый PDF за секунды. Отправьте клиенту ссылку или скачайте на компьютер.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="document-result" id="document-result">
+      <div class="container" id="print-area">
+        <div class="document-toolbar">
+          <h2>Ваш документ готов</h2>
+          <div class="document-toolbar-actions">
+            <button type="button" class="btn btn-ghost" id="btn-edit">Изменить данные</button>
+            <button type="button" class="btn btn-primary" id="btn-print">Распечатать / Сохранить PDF</button>
+          </div>
+        </div>
+        <div class="document-paper" id="document-output"></div>
+      </div>
+    </section>
+
+    <section class="cta" id="cta">
+      <div class="container">
+        <div class="cta-box">
+          <h2>Начните бесплатно прямо сейчас</h2>
+          <p>3 документа в месяц без оплаты. Регистрация за 30 секунд.</p>
+          <button type="button" class="btn btn-primary btn-lg js-open-generator">Попробовать бесплатно</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container footer-inner">
+      <a href="#" class="logo">
+        <div class="logo-icon">Д</div>
+        Документо
+      </a>
+      <p class="footer-copy">© 2026 Документо. Все права защищены.</p>
+      <div class="footer-links">
+        <a href="#">Политика конфиденциальности</a>
+        <a href="#">Оферта</a>
+        <a href="#">Поддержка</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Generator modal -->
+  <div class="modal-overlay" id="generator-modal" aria-hidden="true">
+    <div class="modal" role="dialog" aria-labelledby="modal-title">
+      <button type="button" class="modal-close" id="modal-close" aria-label="Закрыть">&times;</button>
+      <h2 class="modal-title" id="modal-title">Создать документ</h2>
+      <p class="modal-subtitle">Заполните форму — документ сгенерируется мгновенно</p>
+
+      <div class="tabs" role="tablist">
+        <button type="button" class="tab is-active" data-tab="contract" role="tab" aria-selected="true">Договор</button>
+        <button type="button" class="tab" data-tab="act" role="tab" aria-selected="false">Акт</button>
+        <button type="button" class="tab" data-tab="kp" role="tab" aria-selected="false">КП</button>
+      </div>
+
+      <!-- Договор -->
+      <div class="tab-panel is-active" id="panel-contract" role="tabpanel">
+        <form id="form-contract">
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="c-executor">ФИО исполнителя</label>
+              <input type="text" id="c-executor" name="executor" placeholder="Иванов Иван Иванович" required>
+            </div>
+            <div class="form-group">
+              <label for="c-client">ФИО / название заказчика</label>
+              <input type="text" id="c-client" name="client" placeholder="ООО «Ромашка»" required>
+            </div>
+            <div class="form-group full">
+              <label for="c-service">Описание услуги</label>
+              <textarea id="c-service" name="service" placeholder="Разработка лендинга для сайта компании" required></textarea>
+            </div>
+            <div class="form-group">
+              <label for="c-amount">Сумма, ₽</label>
+              <input type="number" id="c-amount" name="amount" placeholder="85000" min="1" required>
+            </div>
+            <div class="form-group">
+              <label for="c-deadline">Срок выполнения</label>
+              <input type="text" id="c-deadline" name="deadline" placeholder="30.06.2026" required>
+            </div>
+            <div class="form-group full">
+              <label for="c-city">Город</label>
+              <input type="text" id="c-city" name="city" placeholder="Москва" required>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <!-- Акт -->
+      <div class="tab-panel" id="panel-act" role="tabpanel">
+        <form id="form-act">
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="a-executor">ФИО исполнителя</label>
+              <input type="text" id="a-executor" name="executor" placeholder="Иванов Иван Иванович" required>
+            </div>
+            <div class="form-group">
+              <label for="a-client">ФИО / название заказчика</label>
+              <input type="text" id="a-client" name="client" placeholder="ООО «Ромашка»" required>
+            </div>
+            <div class="form-group full">
+              <label for="a-work">Описание выполненных работ</label>
+              <textarea id="a-work" name="work" placeholder="Разработан лендинг, свёрстан адаптивный макет, подключена аналитика" required></textarea>
+            </div>
+            <div class="form-group">
+              <label for="a-amount">Сумма, ₽</label>
+              <input type="number" id="a-amount" name="amount" placeholder="85000" min="1" required>
+            </div>
+            <div class="form-group">
+              <label for="a-date">Дата</label>
+              <input type="date" id="a-date" name="date" required>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <!-- КП -->
+      <div class="tab-panel" id="panel-kp" role="tabpanel">
+        <form id="form-kp">
+          <div class="form-grid">
+            <div class="form-group full">
+              <label for="k-title">Название услуги</label>
+              <input type="text" id="k-title" name="title" placeholder="Разработка лендинга" required>
+            </div>
+            <div class="form-group full">
+              <label for="k-desc">Описание</label>
+              <textarea id="k-desc" name="description" placeholder="Создание современного одностраничного сайта с адаптивной вёрсткой, формой обратной связи и подключением аналитики" required></textarea>
+            </div>
+            <div class="form-group">
+              <label for="k-amount">Сумма, ₽</label>
+              <input type="number" id="k-amount" name="amount" placeholder="85000" min="1" required>
+            </div>
+            <div class="form-group">
+              <label for="k-term">Срок</label>
+              <input type="text" id="k-term" name="term" placeholder="14 рабочих дней" required>
+            </div>
+            <div class="form-group">
+              <label for="k-client">Имя клиента</label>
+              <input type="text" id="k-client" name="client" placeholder="Алексей Петров" required>
+            </div>
+            <div class="form-group">
+              <label for="k-executor">Имя исполнителя</label>
+              <input type="text" id="k-executor" name="executor" placeholder="Иван Иванов" required>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <button type="button" class="btn btn-primary btn-generate" id="btn-generate">Сгенерировать документ</button>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      const modal = document.getElementById('generator-modal');
+      const resultSection = document.getElementById('document-result');
+      const output = document.getElementById('document-output');
+      const tabs = document.querySelectorAll('.tab');
+      const panels = document.querySelectorAll('.tab-panel');
+      let activeTab = 'contract';
+
+      const today = new Date();
+      const dateStr = formatDateRu(today);
+      document.getElementById('a-date').valueAsDate = today;
+
+      document.querySelectorAll('.js-open-generator').forEach(function (btn) {
+        btn.addEventListener('click', openModal);
+      });
+
+      document.getElementById('modal-close').addEventListener('click', closeModal);
+      modal.addEventListener('click', function (e) {
+        if (e.target === modal) closeModal();
+      });
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && modal.classList.contains('is-open')) closeModal();
+      });
+
+      tabs.forEach(function (tab) {
+        tab.addEventListener('click', function () {
+          switchTab(tab.dataset.tab);
+        });
+      });
+
+      document.getElementById('btn-generate').addEventListener('click', generate);
+      document.getElementById('btn-print').addEventListener('click', function () {
+        window.print();
+      });
+      document.getElementById('btn-edit').addEventListener('click', openModal);
+
+      function openModal() {
+        modal.classList.add('is-open');
+        modal.setAttribute('aria-hidden', 'false');
+        document.body.style.overflow = 'hidden';
+      }
+
+      function closeModal() {
+        modal.classList.remove('is-open');
+        modal.setAttribute('aria-hidden', 'true');
+        document.body.style.overflow = '';
+      }
+
+      function switchTab(name) {
+        activeTab = name;
+        tabs.forEach(function (t) {
+          var active = t.dataset.tab === name;
+          t.classList.toggle('is-active', active);
+          t.setAttribute('aria-selected', active);
+        });
+        panels.forEach(function (p) {
+          p.classList.toggle('is-active', p.id === 'panel-' + name);
+        });
+      }
+
+      function generate() {
+        var form = document.getElementById('form-' + activeTab);
+        if (!form.reportValidity()) return;
+
+        var data = Object.fromEntries(new FormData(form));
+        var html;
+
+        if (activeTab === 'contract') {
+          html = buildContract(data);
+        } else if (activeTab === 'act') {
+          html = buildAct(data);
+        } else {
+          html = buildKp(data);
+        }
+
+        output.innerHTML = html;
+        resultSection.classList.add('is-visible');
+        closeModal();
+        resultSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+
+      function formatDateRu(d) {
+        var months = ['января','февраля','марта','апреля','мая','июня',
+                      'июля','августа','сентября','октября','ноября','декабря'];
+        return '«' + String(d.getDate()).padStart(2, '0') + '» ' + months[d.getMonth()] + ' ' + d.getFullYear() + ' г.';
+      }
+
+      function formatMoney(n) {
+        return Number(n).toLocaleString('ru-RU') + ' ₽';
+      }
+
+      function amountWords(num) {
+        var n = Math.floor(Number(num));
+        if (isNaN(n)) return '';
+        var ones = ['','один','два','три','четыре','пять','шесть','семь','восемь','девять'];
+        var teens = ['десять','одиннадцать','двенадцать','тринадцать','четырнадцать',
+                     'пятнадцать','шестнадцать','семнадцать','восемнадцать','девятнадцать'];
+        var tens = ['','','двадцать','тридцать','сорок','пятьдесят','шестьдесят','семьдесят','восемьдесят','девяносто'];
+        var hundreds = ['','сто','двести','триста','четыреста','пятьсот','шестьсот','семьсот','восемьсот','девятьсот'];
+
+        function triplet(x, fem) {
+          var h = Math.floor(x / 100);
+          var t = Math.floor((x % 100) / 10);
+          var o = x % 10;
+          var r = hundreds[h];
+          if (t === 1) {
+            r += (r ? ' ' : '') + teens[o];
+          } else {
+            if (t) r += (r ? ' ' : '') + tens[t];
+            if (o) {
+              if (fem && o <= 2) r += (r ? ' ' : '') + (o === 1 ? 'одна' : 'две');
+              else r += (r ? ' ' : '') + ones[o];
+            }
+          }
+          return r;
+        }
+
+        function rubleForm(x) {
+          var mod100 = x % 100;
+          var mod10 = x % 10;
+          if (mod100 >= 11 && mod100 <= 19) return 'рублей';
+          if (mod10 === 1) return 'рубль';
+          if (mod10 >= 2 && mod10 <= 4) return 'рубля';
+          return 'рублей';
+        }
+
+        if (n === 0) return 'ноль рублей';
+        var parts = [];
+        var millions = Math.floor(n / 1000000);
+        var thousands = Math.floor((n % 1000000) / 1000);
+        var rest = n % 1000;
+
+        if (millions) parts.push(triplet(millions, false) + ' миллион' + (millions % 10 === 1 && millions % 100 !== 11 ? '' : (millions % 10 >= 2 && millions % 10 <= 4 && (millions % 100 < 10 || millions % 100 >= 20) ? 'а' : 'ов')));
+        if (thousands) parts.push(triplet(thousands, true) + ' тысяч' + (thousands % 10 === 1 && thousands % 100 !== 11 ? 'а' : ((thousands % 10 >= 2 && thousands % 10 <= 4 && (thousands % 100 < 10 || thousands % 100 >= 20)) ? 'и' : '')));
+        if (rest) parts.push(triplet(rest, false));
+
+        return parts.join(' ') + ' ' + rubleForm(n);
+      }
+
+      function docNum() {
+        return String(Math.floor(Math.random() * 900) + 100);
+      }
+
+      function buildContract(d) {
+        var num = docNum();
+        var amount = formatMoney(d.amount);
+        var words = amountWords(d.amount);
+
+        return ''
+          + '<div class="doc-header"><h1>Договор оказания услуг</h1><div class="doc-num">№ ' + num + '</div></div>'
+          + '<div class="doc-meta">г. ' + esc(d.city) + ', ' + dateStr + '</div>'
+          + '<div class="doc-parties">'
+          + '<p><strong>' + esc(d.executor) + '</strong>, именуемый(ая) в дальнейшем «Исполнитель», с одной стороны, и</p>'
+          + '<p><strong>' + esc(d.client) + '</strong>, именуемый(ая) в дальнейшем «Заказчик», с другой стороны,</p>'
+          + '<p>совместно именуемые «Стороны», заключили настоящий Договор о нижеследующем:</p>'
+          + '</div>'
+          + '<div class="doc-section"><h2>1. Предмет договора</h2>'
+          + '<p>1.1. Исполнитель обязуется оказать Заказчику следующие услуги: <strong>' + esc(d.service) + '</strong>, а Заказчик обязуется принять и оплатить указанные услуги.</p>'
+          + '<p>1.2. Услуги оказываются дистанционно, если иное не согласовано Сторонами дополнительно.</p>'
+          + '</div>'
+          + '<div class="doc-section"><h2>2. Стоимость и порядок оплаты</h2>'
+          + '<p>2.1. Стоимость услуг по настоящему Договору составляет <strong>' + amount + '</strong> (' + words + '), без НДС.</p>'
+          + '<p>2.2. Оплата производится Заказчиком в полном объёме в течение 5 (пяти) рабочих дней с момента подписания настоящего Договора, если иное не согласовано Сторонами.</p>'
+          + '</div>'
+          + '<div class="doc-section"><h2>3. Сроки оказания услуг</h2>'
+          + '<p>3.1. Исполнитель обязуется оказать услуги в срок до <strong>' + esc(d.deadline) + '</strong>.</p>'
+          + '<p>3.2. Датой оказания услуг считается дата подписания Акта оказанных услуг обеими Сторонами.</p>'
+          + '</div>'
+          + '<div class="doc-section"><h2>4. Права и обязанности сторон</h2>'
+          + '<p>4.1. Исполнитель обязуется оказать услуги качественно и в установленные сроки.</p>'
+          + '<p>4.2. Заказчик обязуется своевременно предоставить необходимую информацию и материалы для оказания услуг, а также произвести оплату в установленные сроки.</p>'
+          + '<p>4.3. Заказчик вправе требовать устранения недостатков в разумный срок при их обнаружении.</p>'
+          + '</div>'
+          + '<div class="doc-section"><h2>5. Ответственность сторон</h2>'
+          + '<p>5.1. За неисполнение или ненадлежащее исполнение обязательств по настоящему Договору Стороны несут ответственность в соответствии с действующим законодательством Российской Федерации.</p>'
+          + '</div>'
+          + '<div class="doc-section"><h2>6. Заключительные положения</h2>'
+          + '<p>6.1. Настоящий Договор вступает в силу с момента подписания и действует до полного исполнения Сторонами своих обязательств.</p>'
+          + '<p>6.2. Все споры разрешаются путём переговоров, а при недостижении согласия — в судебном порядке по месту нахождения ответчика.</p>'
+          + '<p>6.3. Договор составлен в двух экземплярах, имеющих одинаковую юридическую силу, по одному для каждой из Сторон.</p>'
+          + '</div>'
+          + '<div class="doc-signatures">'
+          + '<div class="doc-sig-block"><p><strong>Исполнитель:</strong></p><p>' + esc(d.executor) + '</p><div class="doc-sig-line"></div><p>подпись / дата</p></div>'
+          + '<div class="doc-sig-block"><p><strong>Заказчик:</strong></p><p>' + esc(d.client) + '</p><div class="doc-sig-line"></div><p>подпись / дата</p></div>'
+          + '</div>';
+      }
+
+      function buildAct(d) {
+        var num = docNum();
+        var actDate = new Date(d.date);
+        var actDateStr = formatDateRu(actDate);
+        var amount = formatMoney(d.amount);
+        var words = amountWords(d.amount);
+
+        return ''
+          + '<div class="doc-header"><h1>Акт выполненных работ</h1><div class="doc-num">№ ' + num + '</div></div>'
+          + '<div class="doc-meta">' + actDateStr + '</div>'
+          + '<div class="doc-parties">'
+          + '<p><strong>Исполнитель:</strong> ' + esc(d.executor) + '</p>'
+          + '<p><strong>Заказчик:</strong> ' + esc(d.client) + '</p>'
+          + '</div>'
+          + '<div class="doc-section"><h2>1. Перечень выполненных работ</h2>'
+          + '<p>Исполнитель выполнил, а Заказчик принял следующие работы (услуги):</p>'
+          + '<p><strong>' + esc(d.work) + '</strong></p>'
+          + '</div>'
+          + '<div class="doc-section"><h2>2. Стоимость работ</h2>'
+          + '<p>2.1. Общая стоимость выполненных работ составляет <strong>' + amount + '</strong> (' + words + '), без НДС.</p>'
+          + '<p>2.2. Работы выполнены в полном объёме, в установленные сроки и с надлежащим качеством.</p>'
+          + '<p>2.3. Заказчик претензий по объёму, качеству и срокам выполнения работ не имеет.</p>'
+          + '</div>'
+          + '<div class="doc-section"><h2>3. Заключение</h2>'
+          + '<p>Настоящий Акт составлен в двух экземплярах, имеющих одинаковую юридическую силу, по одному для каждой из Сторон, и является основанием для проведения взаимных расчётов.</p>'
+          + '</div>'
+          + '<div class="doc-signatures">'
+          + '<div class="doc-sig-block"><p><strong>Исполнитель:</strong></p><p>' + esc(d.executor) + '</p><div class="doc-sig-line"></div><p>подпись / дата</p></div>'
+          + '<div class="doc-sig-block"><p><strong>Заказчик:</strong></p><p>' + esc(d.client) + '</p><div class="doc-sig-line"></div><p>подпись / дата</p></div>'
+          + '</div>';
+      }
+
+      function buildKp(d) {
+        var amount = formatMoney(d.amount);
+
+        return ''
+          + '<div class="doc-kp-header">'
+          + '<h1>Коммерческое предложение</h1>'
+          + '<p>' + esc(d.title) + '</p>'
+          + '</div>'
+          + '<p>Уважаемый(ая) <strong>' + esc(d.client) + '</strong>!</p>'
+          + '<p style="margin-top:16px">Благодарим за интерес к нашим услугам. Предлагаем рассмотреть следующее коммерческое предложение:</p>'
+          + '<div class="doc-section" style="margin-top:24px"><h2>Описание услуги</h2>'
+          + '<p>' + esc(d.description) + '</p>'
+          + '</div>'
+          + '<div class="doc-kp-price">'
+          + '<div class="price-label">Стоимость</div>'
+          + '<div class="price-value">' + amount + '</div>'
+          + '</div>'
+          + '<div class="doc-section"><h2>Сроки выполнения</h2>'
+          + '<p>' + esc(d.term) + '</p>'
+          + '</div>'
+          + '<p style="margin-top:24px">Готовы приступить к работе в кратчайшие сроки. Для согласования деталей свяжитесь со мной удобным способом.</p>'
+          + '<div class="doc-kp-footer">'
+          + '<div><strong>' + esc(d.executor) + '</strong><br>Исполнитель</div>'
+          + '<div style="text-align:right">' + dateStr + '</div>'
+          + '</div>';
+      }
+
+      function esc(str) {
+        var div = document.createElement('div');
+        div.textContent = str;
+        return div.innerHTML;
+      }
+    })();
+  </script>
+
+</body>
+</html>
