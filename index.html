@@ -1791,23 +1791,33 @@
         btn.disabled = true;
         btn.textContent = 'Генерация PDF...';
 
+        resultSection.classList.add('is-visible');
+        resultSection.style.display = 'block';
+
+        element.style.position = 'fixed';
+        element.style.left = '-9999px';
+        element.style.display = 'block';
+        element.style.visibility = 'visible';
+
         var opt = {
           margin: 15,
           filename: PDF_FILENAMES[lastGeneratedTab] || 'документ.pdf',
           image: { type: 'jpeg', quality: 0.98 },
-          html2canvas: { scale: 2, useCORS: true, logging: false },
+          html2canvas: { scale: 2, useCORS: true },
           jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
         };
 
-        setTimeout(function () {
-          html2pdf().set(opt).from(element).save().then(function () {
-            btn.disabled = false;
-            btn.textContent = label;
-          }).catch(function () {
-            btn.disabled = false;
-            btn.textContent = label;
-          });
-        }, 500);
+        function restoreStyles() {
+          element.style.position = '';
+          element.style.left = '';
+          element.style.display = '';
+          element.style.visibility = '';
+          resultSection.style.display = '';
+          btn.disabled = false;
+          btn.textContent = label;
+        }
+
+        html2pdf().set(opt).from(element).save().then(restoreStyles).catch(restoreStyles);
       }
     })();
   </script>
