@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Политика конфиденциальности — Документо</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --bg: #0a0a0f;
+      --surface: #13131a;
+      --border: rgba(255, 255, 255, 0.08);
+      --text: #f4f4f5;
+      --text-muted: #a1a1aa;
+      --accent: #6366f1;
+      --accent-light: #818cf8;
+      --radius-lg: 20px;
+    }
+
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      background: rgba(10, 10, 15, 0.8);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .header-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 64px;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 700;
+      font-size: 1.15rem;
+      text-decoration: none;
+      color: var(--text);
+    }
+
+    .logo-icon {
+      width: 32px;
+      height: 32px;
+      background: linear-gradient(135deg, var(--accent), #a855f7);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.85rem;
+    }
+
+    .back-link {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+
+    .back-link:hover {
+      color: var(--text);
+    }
+
+    main {
+      padding: 120px 0 80px;
+    }
+
+    .page-title {
+      font-size: clamp(1.8rem, 4vw, 2.4rem);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      margin-bottom: 12px;
+    }
+
+    .page-desc {
+      color: var(--text-muted);
+      margin-bottom: 48px;
+    }
+
+    .legal-section {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 32px;
+      margin-bottom: 24px;
+    }
+
+    .legal-section h2 {
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin-bottom: 16px;
+      color: var(--accent-light);
+    }
+
+    .legal-section p {
+      color: var(--text-muted);
+      margin-bottom: 12px;
+    }
+
+    .legal-section p:last-child {
+      margin-bottom: 0;
+    }
+
+    .legal-section ul {
+      color: var(--text-muted);
+      margin: 0 0 12px 20px;
+    }
+
+    .legal-section li {
+      margin-bottom: 6px;
+    }
+
+    .legal-section a {
+      color: var(--accent-light);
+      text-decoration: none;
+    }
+
+    .legal-section a:hover {
+      text-decoration: underline;
+    }
+
+    footer {
+      padding: 32px 0;
+      border-top: 1px solid var(--border);
+    }
+
+    .footer-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .footer-copy {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 24px;
+    }
+
+    .footer-links a {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .footer-links a:hover {
+      color: var(--text);
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="container header-inner">
+      <a href="index.html" class="logo">
+        <div class="logo-icon">Д</div>
+        Документо
+      </a>
+      <a href="index.html" class="back-link">← На главную</a>
+    </div>
+  </header>
+
+  <main>
+    <div class="container">
+      <h1 class="page-title">Политика конфиденциальности</h1>
+      <p class="page-desc">Настоящая политика описывает, как сервис «Документо» собирает, использует и защищает персональные данные пользователей.</p>
+
+      <section class="legal-section">
+        <h2>1. Общие положения</h2>
+        <p>Настоящая Политика конфиденциальности (далее — Политика) действует в отношении всех персональных данных, которые сервис «Документо» (далее — Сервис) может получить от пользователя при использовании сайта и его функционала.</p>
+        <p>Используя Сервис, вы соглашаетесь с условиями настоящей Политики. Если вы не согласны с её условиями, пожалуйста, воздержитесь от использования Сервиса.</p>
+      </section>
+
+      <section class="legal-section">
+        <h2>2. Какие данные мы собираем</h2>
+        <p>При регистрации и использовании Сервиса мы собираем следующие данные:</p>
+        <ul>
+          <li><strong>Email</strong> — для создания аккаунта, входа в личный кабинет и связи с вами</li>
+          <li><strong>Пароль</strong> — хранится в зашифрованном виде (хеш), мы не имеем доступа к вашему паролю в открытом виде</li>
+          <li><strong>Данные об использовании</strong> — количество сгенерированных документов, дата регистрации</li>
+          <li><strong>Технические данные</strong> — IP-адрес, тип браузера, данные cookies (при необходимости для работы сервиса)</li>
+        </ul>
+        <p>Содержимое документов, которые вы генерируете (ФИО, суммы, описания услуг), обрабатывается локально в вашем браузере и не сохраняется на сервере после закрытия страницы.</p>
+      </section>
+
+      <section class="legal-section">
+        <h2>3. Как мы храним данные</h2>
+        <p>Персональные данные хранятся на защищённых серверах. Пароли хранятся в виде криптографического хеша с использованием алгоритма bcrypt.</p>
+        <p>Данные аккаунта (email, счётчик документов) хранятся в базе данных SQLite на сервере Сервиса. JWT-токен авторизации хранится в localStorage вашего браузера и не передаётся третьим лицам.</p>
+        <p>Мы принимаем разумные организационные и технические меры для защиты данных от несанкционированного доступа, изменения, раскрытия или уничтожения.</p>
+      </section>
+
+      <section class="legal-section">
+        <h2>4. Как мы используем данные</h2>
+        <p>Собранные данные используются исключительно для:</p>
+        <ul>
+          <li>предоставления доступа к функционалу Сервиса</li>
+          <li>идентификации пользователя при входе в аккаунт</li>
+          <li>учёта лимита бесплатных документов</li>
+          <li>связи с вами по вопросам работы Сервиса и поддержки</li>
+          <li>улучшения качества и безопасности Сервиса</li>
+        </ul>
+        <p>Мы не продаём, не сдаём в аренду и не передаём ваши персональные данные третьим лицам, за исключением случаев, предусмотренных законодательством Российской Федерации.</p>
+      </section>
+
+      <section class="legal-section">
+        <h2>5. Cookies и localStorage</h2>
+        <p>Сервис использует localStorage браузера для хранения JWT-токена авторизации. Это необходимо для того, чтобы вам не приходилось входить в аккаунт при каждом посещении сайта.</p>
+        <p>Вы можете удалить токен, выйдя из аккаунта через кнопку «Выйти» или очистив данные сайта в настройках браузера.</p>
+      </section>
+
+      <section class="legal-section">
+        <h2>6. Как удалить свои данные</h2>
+        <p>Вы вправе запросить удаление своего аккаунта и всех связанных персональных данных. Для этого направьте запрос на email: <a href="mailto:efimoff.iq@gmail.com">efimoff.iq@gmail.com</a> с темой «Удаление аккаунта».</p>
+        <p>Мы обработаем запрос в течение 30 дней и удалим ваши данные из базы данных, за исключением информации, которую мы обязаны хранить по закону (например, данные о платежах для налогового учёта).</p>
+        <p>Также вы можете самостоятельно выйти из аккаунта — это удалит токен авторизации из вашего браузера, однако данные аккаунта на сервере сохранятся до получения запроса на удаление.</p>
+      </section>
+
+      <section class="legal-section">
+        <h2>7. Изменения политики</h2>
+        <p>Мы оставляем за собой право обновлять настоящую Политику. Актуальная версия всегда доступна на этой странице. Продолжение использования Сервиса после публикации изменений означает ваше согласие с обновлённой Политикой.</p>
+        <p>Дата последнего обновления: 7 июня 2026 г.</p>
+      </section>
+
+      <section class="legal-section">
+        <h2>8. Контакты</h2>
+        <p>По вопросам, связанным с обработкой персональных данных, обращайтесь:</p>
+        <p>Email: <a href="mailto:efimoff.iq@gmail.com">efimoff.iq@gmail.com</a><br>
+        Исполнитель: Ефимов Алексей Олегович, самозанятый</p>
+      </section>
+    </div>
+  </main>
+
+  <footer>
+    <div class="container footer-inner">
+      <a href="index.html" class="logo">
+        <div class="logo-icon">Д</div>
+        Документо
+      </a>
+      <p class="footer-copy">© 2026 Документо. Все права защищены.</p>
+      <div class="footer-links">
+        <a href="index.html">Главная</a>
+        <a href="legal.html">Правовая информация</a>
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>
