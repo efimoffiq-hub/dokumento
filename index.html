@@ -1099,10 +1099,10 @@
           <h2>Ваш документ готов</h2>
           <div class="document-toolbar-actions">
             <button type="button" class="btn btn-ghost" id="btn-edit">Изменить данные</button>
-            <button type="button" class="btn btn-primary" id="btn-print">Распечатать / Сохранить PDF</button>
+            <button type="button" class="btn btn-primary" id="btn-print">Скачать PDF</button>
           </div>
         </div>
-        <div class="document-paper" id="document-output"></div>
+        <div class="document-paper" id="generated-document"></div>
       </div>
     </section>
 
@@ -1298,7 +1298,7 @@
       const authModal = document.getElementById('auth-modal');
       const generatorModal = document.getElementById('generator-modal');
       const resultSection = document.getElementById('document-result');
-      const output = document.getElementById('document-output');
+      const output = document.getElementById('generated-document');
       const generatorTabs = document.querySelectorAll('#generator-modal .generator-tabs .tab');
       const generatorPanels = document.querySelectorAll('#generator-modal .tab-panel');
       const authTabs = document.querySelectorAll('#auth-modal .auth-tabs .tab');
@@ -1783,26 +1783,31 @@
       }
 
       function downloadPdf() {
-        if (!output.innerHTML.trim()) return;
+        var element = document.getElementById('generated-document');
+        if (!element || !element.innerHTML.trim()) return;
 
         var btn = document.getElementById('btn-print');
         var label = btn.textContent;
         btn.disabled = true;
         btn.textContent = 'Генерация PDF...';
 
-        html2pdf().set({
+        var opt = {
           margin: 15,
           filename: PDF_FILENAMES[lastGeneratedTab] || 'документ.pdf',
           image: { type: 'jpeg', quality: 0.98 },
-          html2canvas: { scale: 2, useCORS: true },
+          html2canvas: { scale: 2, useCORS: true, logging: false },
           jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-        }).from(output).save().then(function () {
-          btn.disabled = false;
-          btn.textContent = label;
-        }).catch(function () {
-          btn.disabled = false;
-          btn.textContent = label;
-        });
+        };
+
+        setTimeout(function () {
+          html2pdf().set(opt).from(element).save().then(function () {
+            btn.disabled = false;
+            btn.textContent = label;
+          }).catch(function () {
+            btn.disabled = false;
+            btn.textContent = label;
+          });
+        }, 500);
       }
     })();
   </script>
