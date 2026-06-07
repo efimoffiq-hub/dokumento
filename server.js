@@ -6,7 +6,7 @@ const Database = require('better-sqlite3');
 const path = require('path');
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 const JWT_SECRET = process.env.JWT_SECRET || 'dokumento-dev-secret-change-in-production';
 const FREE_LIMIT = 3;
 const BCRYPT_ROUNDS = 10;

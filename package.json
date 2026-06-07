@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "Сервис генерации договоров, актов и КП для фрилансеров",
   "main": "server.js",
+  "engines": {
+    "node": ">=20.0.0"
+  },
   "scripts": {
     "start": "node server.js",
     "dev": "node server.js"
