@@ -248,7 +248,7 @@ app.post('/api/payment/create', authMiddleware, async (req, res) => {
 });
 
 // ─── Вебхук ЮKassa ───────────────────────────────────────────────────────────
-app.post('/webhook/yukassa', (req, res) => {
+app.post('/webhook/yukassa', async (req, res) => {
   try {
     // Проверяем Basic Auth от ЮKassa
     const authHeader = req.headers.authorization || '';
