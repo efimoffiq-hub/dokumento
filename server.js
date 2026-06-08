@@ -263,44 +263,73 @@ app.post('/webhook/yukassa', (req, res) => {
 
     console.log(`ЮKassa webhook: ${event}`, object?.id);
 
-    // Нас интересует только успешная оплата
-    if (event !== 'payment.succeeded') {
+    // Успешная оплата
+    if (event === 'payment.succeeded') {
+      const payment = object;
+
+      const paidAmount = parseFloat(payment.amount?.value || '0') * 100;
+      if (paidAmount < PRO_PRICE) {
+        console.warn(`ЮKassa: сумма ${paidAmount} копеек < ${PRO_PRICE}`);
+        return res.status(200).send('OK');
+      }
+
+      const userId = parseInt(payment.metadata?.userId, 10);
+      if (!userId || isNaN(userId)) {
+        console.warn('ЮKassa: нет userId в metadata');
+        return res.status(200).send('OK');
+      }
+
+      const user = db.prepare('SELECT id, plan, plan_expires_at FROM users WHERE id = ?').get(userId);
+      if (!user) {
+        console.warn(`ЮKassa: пользователь ${userId} не найден`);
+        return res.status(200).send('OK');
+      }
+
+      const baseTime = user.plan === 'pro' && user.plan_expires_at > Date.now()
+        ? user.plan_expires_at : Date.now();
+      const expiresAt = baseTime + PRO_DURATION_MS;
+
+      db.prepare('UPDATE users SET plan = ?, plan_expires_at = ? WHERE id = ?').run('pro', expiresAt, userId);
+      console.log(`✅ ЮKassa: пользователь ${userId} → Pro до ${new Date(expiresAt).toISOString()}`);
       return res.status(200).send('OK');
     }
 
-    const payment = object;
+    // Возврат — сбрасываем план на free
+    if (event === 'refund.succeeded') {
+      const refund = object;
 
-    // Проверяем сумму
-    const paidAmount = parseFloat(payment.amount?.value || '0') * 100; // в копейках
-    if (paidAmount < PRO_PRICE) {
-      console.warn(`ЮKassa: сумма ${paidAmount} копеек < ${PRO_PRICE}`);
+      // Пробуем взять userId из metadata возврата
+      let userId = parseInt(refund.metadata?.userId, 10);
+
+      // Если нет — запрашиваем оригинальный платёж по payment_id
+      if (!userId || isNaN(userId)) {
+        try {
+          const paymentId = refund.payment_id;
+          if (paymentId) {
+            const pr = await fetch(`https://api.yookassa.ru/v3/payments/${paymentId}`, {
+              headers: {
+                'Authorization': 'Basic ' + Buffer.from(`${YUKASSA_SHOP_ID}:${YUKASSA_SECRET_KEY}`).toString('base64'),
+              }
+            });
+            const pd = await pr.json();
+            userId = parseInt(pd.metadata?.userId, 10);
+          }
+        } catch (e) {
+          console.error('ЮKassa refund: ошибка получения платежа', e);
+        }
+      }
+
+      if (!userId || isNaN(userId)) {
+        console.warn('ЮKassa refund: не удалось определить userId');
+        return res.status(200).send('OK');
+      }
+
+      db.prepare('UPDATE users SET plan = ?, plan_expires_at = 0 WHERE id = ?').run('free', userId);
+      console.log(`↩️ ЮKassa: пользователь ${userId} → возврат, план сброшен на free`);
       return res.status(200).send('OK');
     }
 
-    // userId из metadata
-    const userId = parseInt(payment.metadata?.userId, 10);
-    if (!userId || isNaN(userId)) {
-      console.warn('ЮKassa: нет userId в metadata');
-      return res.status(200).send('OK');
-    }
-
-    const user = db.prepare('SELECT id, plan FROM users WHERE id = ?').get(userId);
-    if (!user) {
-      console.warn(`ЮKassa: пользователь ${userId} не найден`);
-      return res.status(200).send('OK');
-    }
-
-    // Если уже Pro — продлеваем от текущей даты истечения (или от сейчас)
-    const currentExpires = user.plan === 'pro'
-      ? db.prepare('SELECT plan_expires_at FROM users WHERE id = ?').get(userId).plan_expires_at
-      : 0;
-    const baseTime = currentExpires > Date.now() ? currentExpires : Date.now();
-    const expiresAt = baseTime + PRO_DURATION_MS;
-
-    db.prepare('UPDATE users SET plan = ?, plan_expires_at = ? WHERE id = ?').run('pro', expiresAt, userId);
-
-    console.log(`✅ ЮKassa: пользователь ${userId} → Pro до ${new Date(expiresAt).toISOString()}`);
-    res.status(200).send('OK');
+    return res.status(200).send('OK');
   } catch (err) {
     console.error('Webhook error:', err);
     res.status(500).send('Error');
