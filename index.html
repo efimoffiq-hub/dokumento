@@ -1564,8 +1564,16 @@
               <input type="text" id="c-executor" name="executor" placeholder="Иванов Иван Иванович" required>
             </div>
             <div class="form-group">
+              <label for="c-executor-inn">ИНН исполнителя</label>
+              <input type="text" id="c-executor-inn" name="executorInn" placeholder="123456789012" maxlength="12">
+            </div>
+            <div class="form-group">
               <label for="c-client">ФИО / название заказчика</label>
               <input type="text" id="c-client" name="client" placeholder="ООО «Ромашка»" required>
+            </div>
+            <div class="form-group">
+              <label for="c-client-inn">ИНН заказчика</label>
+              <input type="text" id="c-client-inn" name="clientInn" placeholder="7701234567">
             </div>
             <div class="form-group full">
               <label for="c-service">Описание услуги</label>
@@ -1576,12 +1584,20 @@
               <input type="number" id="c-amount" name="amount" placeholder="85000" min="1" required>
             </div>
             <div class="form-group">
+              <label for="c-prepay">Предоплата, %</label>
+              <input type="number" id="c-prepay" name="prepay" placeholder="50" min="0" max="100" value="50">
+            </div>
+            <div class="form-group">
               <label for="c-deadline">Срок выполнения</label>
               <input type="text" id="c-deadline" name="deadline" placeholder="30.06.2026" required>
             </div>
-            <div class="form-group full">
-              <label for="c-city">Город</label>
+            <div class="form-group">
+              <label for="c-city">Город заключения</label>
               <input type="text" id="c-city" name="city" placeholder="Москва" required>
+            </div>
+            <div class="form-group">
+              <label for="c-executor-contact">Контакт исполнителя</label>
+              <input type="text" id="c-executor-contact" name="executorContact" placeholder="тел. +7 900 000-00-00">
             </div>
           </div>
         </form>
@@ -1599,8 +1615,16 @@
               <label for="a-client">ФИО / название заказчика</label>
               <input type="text" id="a-client" name="client" placeholder="ООО «Ромашка»" required>
             </div>
+            <div class="form-group">
+              <label for="a-contract-num">№ договора (если есть)</label>
+              <input type="text" id="a-contract-num" name="contractNum" placeholder="47">
+            </div>
+            <div class="form-group">
+              <label for="a-contract-date">Дата договора</label>
+              <input type="text" id="a-contract-date" name="contractDate" placeholder="01.06.2026">
+            </div>
             <div class="form-group full">
-              <label for="a-work">Описание выполненных работ</label>
+              <label for="a-work">Описание выполненных работ / услуг</label>
               <textarea id="a-work" name="work" placeholder="Разработан лендинг, свёрстан адаптивный макет, подключена аналитика" required></textarea>
             </div>
             <div class="form-group">
@@ -1608,7 +1632,7 @@
               <input type="number" id="a-amount" name="amount" placeholder="85000" min="1" required>
             </div>
             <div class="form-group">
-              <label for="a-date">Дата</label>
+              <label for="a-date">Дата подписания акта</label>
               <input type="date" id="a-date" name="date" required>
             </div>
           </div>
@@ -1620,28 +1644,36 @@
         <form id="form-kp">
           <div class="form-grid">
             <div class="form-group full">
-              <label for="k-title">Название услуги</label>
+              <label for="k-title">Название услуги / проекта</label>
               <input type="text" id="k-title" name="title" placeholder="Разработка лендинга" required>
             </div>
             <div class="form-group full">
-              <label for="k-desc">Описание</label>
+              <label for="k-desc">Что входит в работу</label>
               <textarea id="k-desc" name="description" placeholder="Создание современного одностраничного сайта с адаптивной вёрсткой, формой обратной связи и подключением аналитики" required></textarea>
             </div>
             <div class="form-group">
-              <label for="k-amount">Сумма, ₽</label>
+              <label for="k-amount">Стоимость, ₽</label>
               <input type="number" id="k-amount" name="amount" placeholder="85000" min="1" required>
             </div>
             <div class="form-group">
-              <label for="k-term">Срок</label>
+              <label for="k-term">Срок выполнения</label>
               <input type="text" id="k-term" name="term" placeholder="14 рабочих дней" required>
             </div>
             <div class="form-group">
-              <label for="k-client">Имя клиента</label>
+              <label for="k-client">Имя / компания клиента</label>
               <input type="text" id="k-client" name="client" placeholder="Алексей Петров" required>
             </div>
             <div class="form-group">
-              <label for="k-executor">Имя исполнителя</label>
+              <label for="k-executor">Ваше имя</label>
               <input type="text" id="k-executor" name="executor" placeholder="Иван Иванов" required>
+            </div>
+            <div class="form-group">
+              <label for="k-contact">Ваш контакт</label>
+              <input type="text" id="k-contact" name="contact" placeholder="тел. +7 900 000-00-00 / @username">
+            </div>
+            <div class="form-group">
+              <label for="k-valid">КП действует до</label>
+              <input type="text" id="k-valid" name="valid" placeholder="30.06.2026">
             </div>
           </div>
         </form>
@@ -2194,43 +2226,77 @@
         var num = docNum();
         var amount = formatMoney(d.amount);
         var words = amountWords(d.amount);
+        var prepay = parseInt(d.prepay || 50, 10);
+        var prepayAmt = formatMoney(Math.round(d.amount * prepay / 100));
+        var finalAmt = formatMoney(Math.round(d.amount * (100 - prepay) / 100));
+        var innExec = d.executorInn ? ', ИНН ' + esc(d.executorInn) : '';
+        var innClient = d.clientInn ? ', ИНН ' + esc(d.clientInn) : '';
+        var contactStr = d.executorContact ? '<p>Контакт Исполнителя: ' + esc(d.executorContact) + '</p>' : '';
+        var prepayBlock = prepay > 0 && prepay < 100
+          ? '<p>2.2. Оплата производится в два этапа: предоплата в размере ' + prepay + '% (' + prepayAmt + ') — в течение 3 (трёх) рабочих дней с момента подписания настоящего Договора; остаток ' + (100-prepay) + '% (' + finalAmt + ') — в течение 3 (трёх) рабочих дней с момента подписания Акта оказанных услуг.</p>'
+          : prepay === 100
+          ? '<p>2.2. Полная предоплата в размере ' + amount + ' (' + words + ') производится в течение 3 (трёх) рабочих дней с момента подписания настоящего Договора.</p>'
+          : '<p>2.2. Оплата в полном объёме производится в течение 5 (пяти) рабочих дней с момента подписания Акта оказанных услуг.</p>';
 
         return ''
           + '<div class="doc-header"><h1>Договор оказания услуг</h1><div class="doc-num">№ ' + num + '</div></div>'
           + '<div class="doc-meta">г. ' + esc(d.city) + ', ' + dateStr + '</div>'
           + '<div class="doc-parties">'
-          + '<p><strong>' + esc(d.executor) + '</strong>, именуемый(ая) в дальнейшем «Исполнитель», с одной стороны, и</p>'
-          + '<p><strong>' + esc(d.client) + '</strong>, именуемый(ая) в дальнейшем «Заказчик», с другой стороны,</p>'
+          + '<p><strong>' + esc(d.executor) + '</strong>' + innExec + ', являющийся плательщиком налога на профессиональный доход (самозанятый), именуемый(ая) в дальнейшем «Исполнитель», с одной стороны, и</p>'
+          + '<p><strong>' + esc(d.client) + '</strong>' + innClient + ', именуемый(ая) в дальнейшем «Заказчик», с другой стороны,</p>'
           + '<p>совместно именуемые «Стороны», заключили настоящий Договор о нижеследующем:</p>'
           + '</div>'
           + '<div class="doc-section"><h2>1. Предмет договора</h2>'
-          + '<p>1.1. Исполнитель обязуется оказать Заказчику следующие услуги: <strong>' + esc(d.service) + '</strong>, а Заказчик обязуется принять и оплатить указанные услуги.</p>'
-          + '<p>1.2. Услуги оказываются дистанционно, если иное не согласовано Сторонами дополнительно.</p>'
+          + '<p>1.1. Исполнитель обязуется по заданию Заказчика оказать следующие услуги: <strong>' + esc(d.service) + '</strong> (далее — «Услуги»), а Заказчик обязуется принять и оплатить Услуги в соответствии с условиями настоящего Договора.</p>'
+          + '<p>1.2. Услуги оказываются дистанционно с использованием средств электронной связи, если иное не согласовано Сторонами дополнительно в письменной форме.</p>'
+          + '<p>1.3. Результат оказания Услуг передаётся Заказчику в электронном виде, если иное не предусмотрено дополнительным соглашением Сторон.</p>'
           + '</div>'
           + '<div class="doc-section"><h2>2. Стоимость и порядок оплаты</h2>'
-          + '<p>2.1. Стоимость услуг по настоящему Договору составляет <strong>' + amount + '</strong> (' + words + '), без НДС.</p>'
-          + '<p>2.2. Оплата производится Заказчиком в полном объёме в течение 5 (пяти) рабочих дней с момента подписания настоящего Договора, если иное не согласовано Сторонами.</p>'
+          + '<p>2.1. Стоимость Услуг по настоящему Договору составляет <strong>' + amount + '</strong> (' + words + '). НДС не облагается в связи с применением Исполнителем специального налогового режима «Налог на профессиональный доход» (ч. 9 ст. 2 Федерального закона № 422-ФЗ от 27.11.2018).</p>'
+          + prepayBlock
+          + '<p>2.3. Оплата производится безналичным переводом на реквизиты Исполнителя или иным согласованным Сторонами способом. Исполнитель выдаёт чек через приложение «Мой налог» в день получения оплаты.</p>'
           + '</div>'
           + '<div class="doc-section"><h2>3. Сроки оказания услуг</h2>'
-          + '<p>3.1. Исполнитель обязуется оказать услуги в срок до <strong>' + esc(d.deadline) + '</strong>.</p>'
-          + '<p>3.2. Датой оказания услуг считается дата подписания Акта оказанных услуг обеими Сторонами.</p>'
+          + '<p>3.1. Исполнитель обязуется оказать Услуги в срок до <strong>' + esc(d.deadline) + '</strong>.</p>'
+          + '<p>3.2. Срок может быть продлён по письменному (в т. ч. электронному) соглашению Сторон в случае непредоставления Заказчиком необходимых материалов или информации в установленные сроки.</p>'
+          + '<p>3.3. Датой исполнения обязательств Исполнителя считается дата подписания обеими Сторонами Акта оказанных услуг.</p>'
           + '</div>'
           + '<div class="doc-section"><h2>4. Права и обязанности сторон</h2>'
-          + '<p>4.1. Исполнитель обязуется оказать услуги качественно и в установленные сроки.</p>'
-          + '<p>4.2. Заказчик обязуется своевременно предоставить необходимую информацию и материалы для оказания услуг, а также произвести оплату в установленные сроки.</p>'
-          + '<p>4.3. Заказчик вправе требовать устранения недостатков в разумный срок при их обнаружении.</p>'
+          + '<p>4.1. Исполнитель обязуется: оказать Услуги качественно, в установленные сроки и в соответствии с требованиями Заказчика; информировать Заказчика о ходе выполнения работ по его запросу; устранять выявленные недостатки в разумный срок, если они возникли по вине Исполнителя.</p>'
+          + '<p>4.2. Заказчик обязуется: своевременно предоставить Исполнителю все необходимые материалы, доступы и информацию; принять результат Услуг в течение 5 (пяти) рабочих дней с момента уведомления о готовности; произвести оплату в установленные настоящим Договором сроки.</p>'
+          + '<p>4.3. Если в течение 5 (пяти) рабочих дней после уведомления Заказчик не подписал Акт и не направил мотивированного отказа — Услуги считаются принятыми, Акт — подписанным в одностороннем порядке.</p>'
+          + '<p>4.4. Исключительное право на результат интеллектуальной деятельности переходит к Заказчику в полном объёме с момента получения Исполнителем полной оплаты по настоящему Договору.</p>'
           + '</div>'
-          + '<div class="doc-section"><h2>5. Ответственность сторон</h2>'
-          + '<p>5.1. За неисполнение или ненадлежащее исполнение обязательств по настоящему Договору Стороны несут ответственность в соответствии с действующим законодательством Российской Федерации.</p>'
+          + '<div class="doc-section"><h2>5. Конфиденциальность</h2>'
+          + '<p>5.1. Стороны обязуются не разглашать третьим лицам конфиденциальную информацию, полученную в ходе исполнения настоящего Договора, без письменного согласия другой Стороны.</p>'
+          + '<p>5.2. Исполнитель вправе указывать факт сотрудничества с Заказчиком в своём портфолио, если Заказчик не направил письменный запрет в течение 5 дней с момента подписания настоящего Договора.</p>'
           + '</div>'
-          + '<div class="doc-section"><h2>6. Заключительные положения</h2>'
-          + '<p>6.1. Настоящий Договор вступает в силу с момента подписания и действует до полного исполнения Сторонами своих обязательств.</p>'
-          + '<p>6.2. Все споры разрешаются путём переговоров, а при недостижении согласия — в судебном порядке по месту нахождения ответчика.</p>'
-          + '<p>6.3. Договор составлен в двух экземплярах, имеющих одинаковую юридическую силу, по одному для каждой из Сторон.</p>'
+          + '<div class="doc-section"><h2>6. Ответственность сторон</h2>'
+          + '<p>6.1. За просрочку оплаты Заказчик уплачивает пеню в размере 0,1% от неоплаченной суммы за каждый день просрочки.</p>'
+          + '<p>6.2. За просрочку исполнения Услуг по вине Исполнителя Исполнитель уплачивает пеню в размере 0,1% от стоимости Услуг за каждый день просрочки, но не более 10% от общей стоимости Договора.</p>'
+          + '<p>6.3. Стороны освобождаются от ответственности при наступлении обстоятельств непреодолимой силы (форс-мажор).</p>'
+          + '</div>'
+          + '<div class="doc-section"><h2>7. Порядок разрешения споров</h2>'
+          + '<p>7.1. Все споры и разногласия Стороны урегулируют путём переговоров. Срок рассмотрения претензии — 10 (десять) рабочих дней с момента её получения.</p>'
+          + '<p>7.2. При недостижении согласия спор передаётся на рассмотрение в суд общей юрисдикции по месту нахождения Исполнителя в соответствии с законодательством РФ.</p>'
+          + '</div>'
+          + '<div class="doc-section"><h2>8. Заключительные положения</h2>'
+          + '<p>8.1. Настоящий Договор вступает в силу с момента подписания и действует до полного исполнения Сторонами своих обязательств.</p>'
+          + '<p>8.2. Любые изменения и дополнения к Договору действительны только при оформлении их в письменном виде и подписании обеими Сторонами.</p>'
+          + '<p>8.3. Договор составлен в двух экземплярах, имеющих одинаковую юридическую силу, по одному для каждой из Сторон. Подписанный скан-образ документа, направленный по электронной почте, имеет юридическую силу оригинала до обмена оригиналами.</p>'
           + '</div>'
           + '<div class="doc-signatures">'
-          + '<div class="doc-sig-block"><p><strong>Исполнитель:</strong></p><p>' + esc(d.executor) + '</p><div class="doc-sig-line"></div><p>подпись / дата</p></div>'
-          + '<div class="doc-sig-block"><p><strong>Заказчик:</strong></p><p>' + esc(d.client) + '</p><div class="doc-sig-line"></div><p>подпись / дата</p></div>'
+          + '<div class="doc-sig-block">'
+          + '<p><strong>Исполнитель:</strong></p>'
+          + '<p>' + esc(d.executor) + (d.executorInn ? '<br>ИНН: ' + esc(d.executorInn) : '') + '</p>'
+          + (d.executorContact ? '<p>' + esc(d.executorContact) + '</p>' : '')
+          + '<div class="doc-sig-line"></div><p>подпись / дата</p>'
+          + '</div>'
+          + '<div class="doc-sig-block">'
+          + '<p><strong>Заказчик:</strong></p>'
+          + '<p>' + esc(d.client) + (d.clientInn ? '<br>ИНН: ' + esc(d.clientInn) : '') + '</p>'
+          + '<div class="doc-sig-line"></div><p>подпись / дата</p>'
+          + '</div>'
           + '</div>';
       }
 
@@ -2240,25 +2306,36 @@
         var actDateStr = formatDateRu(actDate);
         var amount = formatMoney(d.amount);
         var words = amountWords(d.amount);
+        var contractRef = (d.contractNum && d.contractDate)
+          ? 'к Договору оказания услуг № ' + esc(d.contractNum) + ' от ' + esc(d.contractDate)
+          : d.contractNum
+          ? 'к Договору оказания услуг № ' + esc(d.contractNum)
+          : '';
 
         return ''
-          + '<div class="doc-header"><h1>Акт выполненных работ</h1><div class="doc-num">№ ' + num + '</div></div>'
+          + '<div class="doc-header"><h1>Акт оказанных услуг</h1><div class="doc-num">№ ' + num + '</div></div>'
           + '<div class="doc-meta">' + actDateStr + '</div>'
           + '<div class="doc-parties">'
-          + '<p><strong>Исполнитель:</strong> ' + esc(d.executor) + '</p>'
+          + '<p><strong>Исполнитель:</strong> ' + esc(d.executor) + ', плательщик НПД (самозанятый)</p>'
           + '<p><strong>Заказчик:</strong> ' + esc(d.client) + '</p>'
+          + (contractRef ? '<p>Настоящий Акт составлен ' + contractRef + '.</p>' : '')
           + '</div>'
-          + '<div class="doc-section"><h2>1. Перечень выполненных работ</h2>'
-          + '<p>Исполнитель выполнил, а Заказчик принял следующие работы (услуги):</p>'
-          + '<p><strong>' + esc(d.work) + '</strong></p>'
+          + '<div class="doc-section"><h2>1. Перечень оказанных услуг</h2>'
+          + '<p>Исполнитель оказал, а Заказчик принял следующие услуги:</p>'
+          + '<p style="margin-top:8px"><strong>' + esc(d.work) + '</strong></p>'
           + '</div>'
-          + '<div class="doc-section"><h2>2. Стоимость работ</h2>'
-          + '<p>2.1. Общая стоимость выполненных работ составляет <strong>' + amount + '</strong> (' + words + '), без НДС.</p>'
-          + '<p>2.2. Работы выполнены в полном объёме, в установленные сроки и с надлежащим качеством.</p>'
-          + '<p>2.3. Заказчик претензий по объёму, качеству и срокам выполнения работ не имеет.</p>'
+          + '<div class="doc-section"><h2>2. Стоимость и оплата</h2>'
+          + '<p>2.1. Общая стоимость оказанных услуг составляет <strong>' + amount + '</strong> (' + words + '). НДС не облагается в связи с применением Исполнителем специального налогового режима «Налог на профессиональный доход».</p>'
+          + '<p>2.2. Услуги оказаны в полном объёме, в установленные сроки и с надлежащим качеством.</p>'
+          + '<p>2.3. Оплата производится Заказчиком в течение 3 (трёх) рабочих дней с даты подписания настоящего Акта, если иное не предусмотрено Договором.</p>'
           + '</div>'
-          + '<div class="doc-section"><h2>3. Заключение</h2>'
-          + '<p>Настоящий Акт составлен в двух экземплярах, имеющих одинаковую юридическую силу, по одному для каждой из Сторон, и является основанием для проведения взаимных расчётов.</p>'
+          + '<div class="doc-section"><h2>3. Приёмка услуг</h2>'
+          + '<p>3.1. Заказчик принял оказанные услуги в полном объёме. Претензий по объёму, качеству и срокам оказания услуг Заказчик не имеет.</p>'
+          + '<p>3.2. Настоящий Акт является основанием для проведения окончательных расчётов между Сторонами по Договору.</p>'
+          + '<p>3.3. Если в течение 5 (пяти) рабочих дней с момента получения Акта Заказчик не подписал его и не направил мотивированного отказа, услуги считаются принятыми, Акт — подписанным в одностороннем порядке.</p>'
+          + '</div>'
+          + '<div class="doc-section"><h2>4. Заключительные положения</h2>'
+          + '<p>Настоящий Акт составлен в двух экземплярах, имеющих одинаковую юридическую силу, по одному для каждой из Сторон. Подписанный скан-образ имеет юридическую силу оригинала.</p>'
           + '</div>'
           + '<div class="doc-signatures">'
           + '<div class="doc-sig-block"><p><strong>Исполнитель:</strong></p><p>' + esc(d.executor) + '</p><div class="doc-sig-line"></div><p>подпись / дата</p></div>'
@@ -2268,27 +2345,41 @@
 
       function buildKp(d) {
         var amount = formatMoney(d.amount);
+        var validStr = d.valid ? '<p><strong>Срок действия предложения:</strong> до ' + esc(d.valid) + '</p>' : '';
+        var contactStr = d.contact ? esc(d.contact) : '';
 
         return ''
           + '<div class="doc-kp-header">'
           + '<h1>Коммерческое предложение</h1>'
           + '<p>' + esc(d.title) + '</p>'
           + '</div>'
-          + '<p>Уважаемый(ая) <strong>' + esc(d.client) + '</strong>!</p>'
-          + '<p style="margin-top:16px">Благодарим за интерес к нашим услугам. Предлагаем рассмотреть следующее коммерческое предложение:</p>'
-          + '<div class="doc-section" style="margin-top:24px"><h2>Описание услуги</h2>'
+          + '<p>Уважаемый(ая) <strong>' + esc(d.client) + '</strong>,</p>'
+          + '<p style="margin-top:12px">предлагаю Вашему вниманию коммерческое предложение по услуге <strong>«' + esc(d.title) + '»</strong>. Ниже — подробное описание, стоимость и условия работы.</p>'
+          + '<div class="doc-section" style="margin-top:24px"><h2>Что входит в работу</h2>'
           + '<p>' + esc(d.description) + '</p>'
           + '</div>'
           + '<div class="doc-kp-price">'
-          + '<div class="price-label">Стоимость</div>'
+          + '<div class="price-label">Стоимость услуги</div>'
           + '<div class="price-value">' + amount + '</div>'
+          + '<div style="font-size:12px;color:#888;margin-top:4px">НДС не облагается (самозанятый, ФЗ № 422)</div>'
           + '</div>'
           + '<div class="doc-section"><h2>Сроки выполнения</h2>'
           + '<p>' + esc(d.term) + '</p>'
           + '</div>'
-          + '<p style="margin-top:24px">Готовы приступить к работе в кратчайшие сроки. Для согласования деталей свяжитесь со мной удобным способом.</p>'
+          + '<div class="doc-section"><h2>Порядок работы</h2>'
+          + '<p>1. Согласование технического задания и деталей проекта.</p>'
+          + '<p>2. Внесение предоплаты (по договорённости) — начало работы.</p>'
+          + '<p>3. Сдача результата, правки, финальная приёмка.</p>'
+          + '<p>4. Подписание Акта оказанных услуг, финальный расчёт.</p>'
+          + '<p>5. Исполнитель выдаёт чек через «Мой налог» — всё легально.</p>'
+          + '</div>'
+          + '<div class="doc-section"><h2>Почему я</h2>'
+          + '<p>Работаю официально как самозанятый — вы получаете закрывающие документы (договор, акт, чек) и можете включить расходы в затраты. Никаких серых схем.</p>'
+          + '</div>'
+          + (validStr ? '<div class="doc-section">' + validStr + '</div>' : '')
+          + '<p style="margin-top:24px">Готов приступить к работе после согласования деталей. Пишите — отвечу быстро.</p>'
           + '<div class="doc-kp-footer">'
-          + '<div><strong>' + esc(d.executor) + '</strong><br>Исполнитель</div>'
+          + '<div><strong>' + esc(d.executor) + '</strong><br>Исполнитель, самозанятый' + (contactStr ? '<br>' + contactStr : '') + '</div>'
           + '<div style="text-align:right">' + dateStr + '</div>'
           + '</div>';
       }
@@ -2341,8 +2432,10 @@
       // === REQUISITES SAVE ===
       var REQ_KEY = 'dokumento_req';
 
-      function saveRequisites(executor, city) {
-        if (executor) localStorage.setItem(REQ_KEY, JSON.stringify({ executor: executor, city: city || '' }));
+      function saveRequisites(executor, city, inn, contact) {
+        if (executor) localStorage.setItem(REQ_KEY, JSON.stringify({
+          executor: executor, city: city || '', inn: inn || '', contact: contact || ''
+        }));
       }
 
       function loadRequisites() {
@@ -2359,6 +2452,12 @@
         });
         var cityEl = document.getElementById('c-city');
         if (cityEl && !cityEl.value && req.city) cityEl.value = req.city;
+        var innEl = document.getElementById('c-executor-inn');
+        if (innEl && !innEl.value && req.inn) innEl.value = req.inn;
+        var contactEl = document.getElementById('c-executor-contact');
+        if (contactEl && !contactEl.value && req.contact) contactEl.value = req.contact;
+        var kContactEl = document.getElementById('k-contact');
+        if (kContactEl && !kContactEl.value && req.contact) kContactEl.value = req.contact;
         var hint = document.getElementById('req-hint');
         if (hint) hint.style.display = 'inline';
       }
@@ -2403,7 +2502,7 @@
           var data = Object.fromEntries(new FormData(form));
           if (activeTab === 'contract') {
             lastContractData = data;
-            saveRequisites(data.executor, data.city);
+            saveRequisites(data.executor, data.city, data.executorInn, data.executorContact);
             document.getElementById('btn-create-act').style.display = 'inline-flex';
           } else {
             document.getElementById('btn-create-act').style.display = 'none';
