@@ -1042,6 +1042,191 @@
         transform: scale(1);
       }
     }
+
+    /* =====================
+       MOBILE (≤ 480px)
+    ===================== */
+    @media (max-width: 480px) {
+      :root { font-size: 15px; }
+
+      .container { padding: 0 16px; }
+
+      header { padding: 0 16px; }
+      .header-inner { padding: 0; }
+      .header-auth { gap: 8px; }
+      .header-auth .btn { padding: 6px 12px; font-size: 0.8rem; }
+      #user-email { display: none !important; }
+
+      .hero { padding: 100px 0 48px; }
+      .hero h1 { font-size: 1.9rem; line-height: 1.2; }
+      .hero p { font-size: 1rem; }
+      .hero-actions { flex-direction: column; gap: 12px; align-items: stretch; }
+      .hero-actions .btn { width: 100%; text-align: center; justify-content: center; }
+
+      .preview-card { padding: 16px; margin-top: 40px; }
+      .preview-tabs { gap: 6px; }
+      .preview-tab { font-size: 0.75rem; padding: 4px 10px; }
+
+      .features, .steps, .pricing, .cta { padding: 60px 0; }
+      .section-title { font-size: 1.6rem; }
+
+      .features-grid { grid-template-columns: 1fr; gap: 16px; }
+      .feature-card { padding: 20px; }
+
+      .steps-grid { grid-template-columns: 1fr; gap: 24px; }
+
+      .pricing-grid { grid-template-columns: 1fr; gap: 16px; }
+      .pricing-card { padding: 24px; }
+
+      .document-toolbar { flex-direction: column; gap: 12px; align-items: stretch; }
+      .document-toolbar h2 { font-size: 1.1rem; }
+      .document-toolbar-actions { display: flex; flex-direction: column; gap: 8px; }
+      .document-toolbar-actions .btn { width: 100%; text-align: center; justify-content: center; }
+      .document-paper { padding: 24px 16px; font-size: 0.85rem; }
+      .doc-header h1 { font-size: 1rem; }
+      .doc-signatures { flex-direction: column; gap: 24px; }
+
+      .modal-overlay { padding: 0; align-items: flex-end; }
+      .modal { max-height: 92vh; border-radius: var(--radius-lg) var(--radius-lg) 0 0; padding: 24px 16px; }
+      .modal-title { font-size: 1.2rem; }
+      .tabs { gap: 4px; }
+      .tab { font-size: 0.8rem; padding: 6px 10px; }
+      .btn-generate { width: 100%; }
+
+      .cta-box { padding: 40px 20px; }
+      .cta-box h2 { font-size: 1.4rem; }
+
+      footer { padding: 32px 0; }
+      .footer-inner { flex-direction: column; gap: 16px; text-align: center; }
+      .footer-links { flex-direction: column; gap: 8px; align-items: center; }
+    }
+
+
+    /* ── Pro modal ─────────────────────────────────── */
+    .pro-modal-header {
+      background: linear-gradient(135deg, var(--accent), #a855f7);
+      margin: -32px -32px 28px;
+      padding: 32px;
+      border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+      text-align: center;
+    }
+    .pro-modal-header .pro-price {
+      font-size: 2.8rem;
+      font-weight: 800;
+      color: #fff;
+      letter-spacing: -0.03em;
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+    .pro-modal-header .pro-price span {
+      font-size: 1rem;
+      font-weight: 400;
+      opacity: 0.8;
+    }
+    .pro-modal-header p {
+      color: rgba(255,255,255,0.85);
+      font-size: 0.95rem;
+      margin-top: 8px;
+    }
+    .pro-features-list {
+      list-style: none;
+      margin-bottom: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .pro-features-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      font-size: 0.92rem;
+      line-height: 1.5;
+    }
+    .pro-features-list li .pf-icon {
+      flex-shrink: 0;
+      width: 22px;
+      height: 22px;
+      background: rgba(99,102,241,0.15);
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+    }
+    .pro-divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 20px 0;
+    }
+    .btn-pay {
+      background: linear-gradient(135deg, var(--accent), #a855f7);
+      color: #fff;
+      box-shadow: 0 4px 24px rgba(99,102,241,0.4);
+    }
+    .btn-pay:hover { opacity: 0.9; transform: translateY(-1px); }
+    .btn-pay:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+    .pay-note {
+      text-align: center;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-top: 12px;
+    }
+
+    /* ── Plan badge в хедере ────────────────────────── */
+    .plan-badge-header {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: linear-gradient(135deg, rgba(99,102,241,0.2), rgba(168,85,247,0.2));
+      border: 1px solid rgba(99,102,241,0.4);
+      border-radius: 999px;
+      padding: 3px 10px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--accent-light);
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+    .plan-badge-header:hover { opacity: 0.8; }
+    .plan-badge-header.hidden-block { display: none !important; }
+
+    /* ── Баннер истечения подписки ──────────────────── */
+    .expiry-banner {
+      display: none;
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 300;
+      background: var(--surface);
+      border: 1px solid rgba(239,68,68,0.4);
+      border-radius: 12px;
+      padding: 14px 20px;
+      font-size: 0.88rem;
+      color: #fca5a5;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+      white-space: nowrap;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .expiry-banner.is-hidden { display: none !important; }
+    .expiry-banner button {
+      background: rgba(239,68,68,0.15);
+      border: 1px solid rgba(239,68,68,0.3);
+      border-radius: 8px;
+      color: #fca5a5;
+      font-size: 0.8rem;
+      font-weight: 600;
+      padding: 4px 12px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .expiry-banner button:hover { background: rgba(239,68,68,0.25); }
+    @media (max-width: 480px) {
+      .expiry-banner { white-space: normal; bottom: 12px; left: 12px; right: 12px; transform: none; }
+      .pro-modal-header { margin: -24px -16px 24px; padding: 24px 20px; }
+    }
   </style>
 </head>
 <body>
@@ -1061,6 +1246,7 @@
           <button type="button" class="btn btn-ghost js-open-auth" id="header-btn-login">Войти</button>
           <button type="button" class="btn btn-primary js-open-generator">Попробовать бесплатно</button>
           <span class="user-email hidden-block" id="user-email"></span>
+          <span class="plan-badge-header hidden-block" id="plan-badge-header" title="Нажмите, чтобы улучшить план">⚡ Pro</span>
           <button type="button" class="btn btn-ghost hidden-block" id="btn-logout">Выйти</button>
         </div>
       </nav>
@@ -1215,7 +1401,7 @@
               <li>✓ Приоритетная поддержка</li>
               <li>✓ Новые типы документов</li>
             </ul>
-            <button type="button" class="btn btn-primary btn-lg js-open-generator" style="width:100%">Выбрать Про</button>
+            <button type="button" class="btn btn-primary btn-lg js-open-pro" style="width:100%">Выбрать Про</button>
           </div>
           <div class="pricing-card">
             <div class="pricing-name">Бизнес</div>
@@ -1417,6 +1603,56 @@
     </div>
   </div>
 
+  <!-- Баннер истечения подписки -->
+  <div class="expiry-banner is-hidden" id="expiry-banner">
+    <span id="expiry-banner-text">⚠️ Подписка Pro истекает через 3 дня</span>
+    <button type="button" id="expiry-banner-btn">Продлить</button>
+    <button type="button" onclick="document.getElementById('expiry-banner').classList.add('is-hidden')" style="background:transparent;border:none;color:var(--text-muted);font-size:1.1rem;cursor:pointer;padding:0 4px">×</button>
+  </div>
+
+  <!-- Pro modal -->
+  <div class="modal-overlay" id="pro-modal" aria-hidden="true">
+    <div class="modal" role="dialog" aria-labelledby="pro-modal-title" style="max-width:480px">
+      <button type="button" class="modal-close" id="pro-modal-close" aria-label="Закрыть">&times;</button>
+
+      <div class="pro-modal-header">
+        <div style="font-size:2rem;margin-bottom:8px">⚡</div>
+        <div class="pro-price">499 ₽<span>/месяц</span></div>
+        <p>Безлимитные документы без ограничений</p>
+      </div>
+
+      <h2 class="modal-title" id="pro-modal-title" style="margin-bottom:20px">Документо Pro</h2>
+
+      <ul class="pro-features-list">
+        <li>
+          <span class="pf-icon">📄</span>
+          <span><strong>Безлимитные документы</strong> — договоры, акты, КП сколько угодно в месяц</span>
+        </li>
+        <li>
+          <span class="pf-icon">⚡</span>
+          <span><strong>Приоритетная поддержка</strong> — ответ в течение 24 часов по email</span>
+        </li>
+        <li>
+          <span class="pf-icon">🆕</span>
+          <span><strong>Новые типы документов</strong> — первыми получаете доступ к обновлениям</span>
+        </li>
+        <li>
+          <span class="pf-icon">🔒</span>
+          <span><strong>Без рекламы</strong> — чистый сервис без лишнего</span>
+        </li>
+      </ul>
+
+      <hr class="pro-divider">
+
+      <div id="pro-modal-current-plan" style="display:none;margin-bottom:16px;padding:12px 16px;background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.2);border-radius:10px;font-size:0.88rem;color:#86efac;text-align:center"></div>
+
+      <button type="button" class="btn btn-pay btn-lg" id="btn-pay" style="width:100%">
+        Перейти к оплате — 499 ₽
+      </button>
+      <p class="pay-note">Оплата через ЮKassa · Карта, СБП, кошелёк · Отменить можно в любой момент</p>
+    </div>
+  </div>
+
   <script>
     (function () {
       const API = 'https://dokumento-production.up.railway.app';
@@ -1447,9 +1683,23 @@
       const dateStr = formatDateRu(today);
       document.getElementById('a-date').valueAsDate = today;
 
+      const proModal = document.getElementById('pro-modal');
+
       document.querySelectorAll('.js-open-generator').forEach(function (btn) {
         btn.addEventListener('click', tryOpenGenerator);
       });
+
+      document.querySelectorAll('.js-open-pro').forEach(function (btn) {
+        btn.addEventListener('click', openProModal);
+      });
+
+      document.getElementById('plan-badge-header').addEventListener('click', openProModal);
+      document.getElementById('pro-modal-close').addEventListener('click', closeProModal);
+      proModal.addEventListener('click', function(e) { if (e.target === proModal) closeProModal(); });
+
+      document.getElementById('expiry-banner-btn').addEventListener('click', openProModal);
+
+      document.getElementById('btn-pay').addEventListener('click', handlePay);
 
       document.querySelectorAll('.js-open-auth').forEach(function (btn) {
         btn.addEventListener('click', function () {
@@ -1538,17 +1788,40 @@
         var loginBtn = document.getElementById('header-btn-login');
         var emailEl = document.getElementById('user-email');
         var logoutBtn = document.getElementById('btn-logout');
+        var planBadge = document.getElementById('plan-badge-header');
 
         if (isLoggedIn) {
           loginBtn.classList.add('hidden-block');
           emailEl.textContent = currentUser.email;
           emailEl.classList.remove('hidden-block');
           logoutBtn.classList.remove('hidden-block');
+
+          // Показываем Pro-бейдж только если план Pro
+          if (currentUser.plan === 'pro') {
+            planBadge.classList.remove('hidden-block');
+            var daysLeft = currentUser.planDaysLeft;
+            planBadge.textContent = daysLeft !== null ? '⚡ Pro · ' + daysLeft + ' дн.' : '⚡ Pro';
+          } else {
+            planBadge.classList.add('hidden-block');
+          }
+
+          // Баннер истечения
+          var banner = document.getElementById('expiry-banner');
+          if (currentUser.planExpiringSoon && currentUser.planDaysLeft !== null) {
+            document.getElementById('expiry-banner-text').textContent =
+              '⚠️ Подписка Pro истекает через ' + currentUser.planDaysLeft + ' ' +
+              (currentUser.planDaysLeft === 1 ? 'день' : currentUser.planDaysLeft < 5 ? 'дня' : 'дней');
+            banner.classList.remove('is-hidden');
+          } else {
+            banner.classList.add('is-hidden');
+          }
         } else {
           loginBtn.classList.remove('hidden-block');
           emailEl.textContent = '';
           emailEl.classList.add('hidden-block');
           logoutBtn.classList.add('hidden-block');
+          planBadge.classList.add('hidden-block');
+          document.getElementById('expiry-banner').classList.add('is-hidden');
         }
       }
 
@@ -1694,7 +1967,9 @@
           var result = await apiFetch('/api/documents/count', { method: 'POST' });
 
           if (result.res.status === 403) {
-            showGeneratorError('Бесплатный лимит 3 документа в месяц исчерпан');
+            showGeneratorError('Лимит исчерпан — 3 документа в месяц на бесплатном плане');
+            // Показываем Pro-модалку через секунду
+            setTimeout(function() { closeGeneratorModal(); openProModal(); }, 1200);
             return;
           }
 
@@ -1735,6 +2010,54 @@
           showGeneratorError('Не удалось связаться с сервером. Запустите npm start');
         } finally {
           btn.disabled = false;
+        }
+      }
+
+      function openProModal() {
+        var infoEl = document.getElementById('pro-modal-current-plan');
+        if (currentUser && currentUser.plan === 'pro' && currentUser.planDaysLeft !== null) {
+          infoEl.style.display = 'block';
+          infoEl.textContent = '✓ У вас активен Pro-план · осталось ' + currentUser.planDaysLeft + ' дн. · оплата продлит срок';
+          document.getElementById('btn-pay').textContent = 'Продлить — 499 ₽';
+        } else {
+          infoEl.style.display = 'none';
+          document.getElementById('btn-pay').textContent = 'Перейти к оплате — 499 ₽';
+        }
+        proModal.classList.add('is-open');
+        proModal.setAttribute('aria-hidden', 'false');
+        document.body.style.overflow = 'hidden';
+      }
+
+      function closeProModal() {
+        proModal.classList.remove('is-open');
+        proModal.setAttribute('aria-hidden', 'true');
+        document.body.style.overflow = '';
+      }
+
+      async function handlePay() {
+        if (!getToken() || !currentUser) {
+          closeProModal();
+          openGeneratorAfterAuth = false;
+          openAuthModal('register');
+          return;
+        }
+        var btn = document.getElementById('btn-pay');
+        btn.disabled = true;
+        btn.textContent = 'Создаём платёж...';
+        try {
+          var result = await apiFetch('/api/payment/create', { method: 'POST' });
+          if (!result.res.ok) {
+            alert(result.data.error || 'Ошибка при создании платежа. Попробуйте позже.');
+            btn.disabled = false;
+            btn.textContent = 'Перейти к оплате — 499 ₽';
+            return;
+          }
+          // Редиректим на страницу оплаты ЮKassa
+          window.location.href = result.data.url;
+        } catch(e) {
+          alert('Не удалось связаться с сервером.');
+          btn.disabled = false;
+          btn.textContent = 'Перейти к оплате — 499 ₽';
         }
       }
 
