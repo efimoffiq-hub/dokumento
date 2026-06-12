@@ -42,6 +42,94 @@
       --green: #16a34a;
     }
 
+    /* ── Option toggles ─────────────────────────── */
+    .opt-group {
+      grid-column: 1 / -1;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 4px;
+    }
+    .opt-toggle {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s;
+      user-select: none;
+    }
+    .opt-toggle:hover { border-color: rgba(99,102,241,0.4); }
+    .opt-toggle.is-on {
+      background: rgba(99,102,241,0.08);
+      border-color: rgba(99,102,241,0.35);
+    }
+    .opt-toggle-switch {
+      width: 36px;
+      height: 20px;
+      background: var(--border);
+      border-radius: 999px;
+      position: relative;
+      flex-shrink: 0;
+      transition: background 0.2s;
+    }
+    .opt-toggle.is-on .opt-toggle-switch { background: var(--accent); }
+    .opt-toggle-switch::after {
+      content: '';
+      position: absolute;
+      width: 14px;
+      height: 14px;
+      background: #fff;
+      border-radius: 50%;
+      top: 3px;
+      left: 3px;
+      transition: transform 0.2s;
+    }
+    .opt-toggle.is-on .opt-toggle-switch::after { transform: translateX(16px); }
+    .opt-toggle-label { flex: 1; font-size: 0.88rem; font-weight: 500; color: var(--text); }
+    .opt-toggle-desc { font-size: 0.78rem; color: var(--text-muted); font-weight: 400; }
+
+    /* Conditional fields */
+    .opt-field {
+      grid-column: 1 / -1;
+      display: none;
+      gap: 12px;
+    }
+    .opt-field.is-visible { display: flex; flex-wrap: wrap; }
+    .opt-field .form-group { flex: 1; min-width: 140px; margin: 0; }
+
+    /* Amount preview */
+    .amount-preview {
+      grid-column: 1 / -1;
+      display: none;
+      background: rgba(99,102,241,0.07);
+      border: 1px solid rgba(99,102,241,0.2);
+      border-radius: 10px;
+      padding: 12px 16px;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .amount-preview.is-visible { display: flex; }
+    .amount-preview-item strong { color: var(--text); font-size: 0.95rem; }
+
+    /* Section divider in form */
+    .form-section-label {
+      grid-column: 1 / -1;
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      padding-top: 8px;
+      border-top: 1px solid var(--border);
+      margin-top: 4px;
+    }
+
     .theme-toggle {
       width: 36px;
       height: 36px;
@@ -1559,22 +1647,39 @@
       <div class="tab-panel is-active" id="panel-contract" role="tabpanel">
         <form id="form-contract">
           <div class="form-grid">
+
+            <div class="form-section-label">Исполнитель</div>
+
             <div class="form-group">
-              <label for="c-executor">ФИО исполнителя <span style="color:var(--accent-light);font-size:0.75rem;display:none" id="req-hint">· сохранено</span></label>
+              <label for="c-executor">ФИО <span style="color:var(--accent-light);font-size:0.75rem;display:none" id="req-hint">· сохранено</span></label>
               <input type="text" id="c-executor" name="executor" placeholder="Иванов Иван Иванович" required>
             </div>
             <div class="form-group">
-              <label for="c-executor-inn">ИНН исполнителя</label>
+              <label for="c-executor-inn">ИНН</label>
               <input type="text" id="c-executor-inn" name="executorInn" placeholder="123456789012" maxlength="12">
             </div>
             <div class="form-group">
-              <label for="c-client">ФИО / название заказчика</label>
+              <label for="c-city">Город заключения</label>
+              <input type="text" id="c-city" name="city" placeholder="Москва" required>
+            </div>
+            <div class="form-group">
+              <label for="c-executor-contact">Телефон / email</label>
+              <input type="text" id="c-executor-contact" name="executorContact" placeholder="+7 900 000-00-00">
+            </div>
+
+            <div class="form-section-label">Заказчик</div>
+
+            <div class="form-group">
+              <label for="c-client">ФИО / название</label>
               <input type="text" id="c-client" name="client" placeholder="ООО «Ромашка»" required>
             </div>
             <div class="form-group">
               <label for="c-client-inn">ИНН заказчика</label>
               <input type="text" id="c-client-inn" name="clientInn" placeholder="7701234567">
             </div>
+
+            <div class="form-section-label">Услуга и оплата</div>
+
             <div class="form-group full">
               <label for="c-service">Описание услуги</label>
               <textarea id="c-service" name="service" placeholder="Разработка лендинга для сайта компании" required></textarea>
@@ -1584,20 +1689,84 @@
               <input type="number" id="c-amount" name="amount" placeholder="85000" min="1" required>
             </div>
             <div class="form-group">
-              <label for="c-prepay">Предоплата, %</label>
-              <input type="number" id="c-prepay" name="prepay" placeholder="50" min="0" max="100" value="50">
-            </div>
-            <div class="form-group">
               <label for="c-deadline">Срок выполнения</label>
               <input type="text" id="c-deadline" name="deadline" placeholder="30.06.2026" required>
             </div>
-            <div class="form-group">
-              <label for="c-city">Город заключения</label>
-              <input type="text" id="c-city" name="city" placeholder="Москва" required>
+
+            <!-- Превью расчёта -->
+            <div class="amount-preview" id="c-amount-preview">
+              <div class="amount-preview-item">Предоплата: <strong id="c-preview-prepay">—</strong></div>
+              <div class="amount-preview-item">Остаток: <strong id="c-preview-rest">—</strong></div>
             </div>
-            <div class="form-group">
-              <label for="c-executor-contact">Контакт исполнителя</label>
-              <input type="text" id="c-executor-contact" name="executorContact" placeholder="тел. +7 900 000-00-00">
+
+            <div class="form-section-label">Опции договора</div>
+
+            <div class="opt-group">
+
+              <label class="opt-toggle is-on" id="opt-c-prepay" data-opt="c-prepay">
+                <div class="opt-toggle-switch"></div>
+                <div class="opt-toggle-label">
+                  Предоплата
+                  <div class="opt-toggle-desc">Разбить оплату на предоплату и остаток</div>
+                </div>
+              </label>
+              <div class="opt-field is-visible" id="field-c-prepay">
+                <div class="form-group">
+                  <label for="c-prepay-pct">Предоплата, %</label>
+                  <input type="number" id="c-prepay-pct" name="prepay" placeholder="50" min="1" max="99" value="50">
+                </div>
+              </div>
+
+              <label class="opt-toggle is-on" id="opt-c-penalty" data-opt="c-penalty">
+                <div class="opt-toggle-switch"></div>
+                <div class="opt-toggle-label">
+                  Пеня за просрочку
+                  <div class="opt-toggle-desc">0,1% в день за просрочку оплаты или сдачи</div>
+                </div>
+              </label>
+
+              <label class="opt-toggle is-on" id="opt-c-nda" data-opt="c-nda">
+                <div class="opt-toggle-switch"></div>
+                <div class="opt-toggle-label">
+                  Конфиденциальность (NDA)
+                  <div class="opt-toggle-desc">Стороны не разглашают данные проекта</div>
+                </div>
+              </label>
+
+              <label class="opt-toggle is-on" id="opt-c-portfolio" data-opt="c-portfolio">
+                <div class="opt-toggle-switch"></div>
+                <div class="opt-toggle-label">
+                  Право на портфолио
+                  <div class="opt-toggle-desc">Исполнитель может упомянуть проект в портфолио</div>
+                </div>
+              </label>
+
+              <label class="opt-toggle is-on" id="opt-c-ip" data-opt="c-ip">
+                <div class="opt-toggle-switch"></div>
+                <div class="opt-toggle-label">
+                  Передача прав на результат
+                  <div class="opt-toggle-desc">Исключительные права переходят после полной оплаты</div>
+                </div>
+              </label>
+
+              <label class="opt-toggle" id="opt-c-remote" data-opt="c-remote">
+                <div class="opt-toggle-switch"></div>
+                <div class="opt-toggle-label">
+                  Указать реквизиты банка
+                  <div class="opt-toggle-desc">Добавить банковские реквизиты исполнителя</div>
+                </div>
+              </label>
+              <div class="opt-field" id="field-c-remote">
+                <div class="form-group">
+                  <label for="c-bank">Банк</label>
+                  <input type="text" id="c-bank" name="bank" placeholder="Сбербанк">
+                </div>
+                <div class="form-group">
+                  <label for="c-account">Номер счёта / карты</label>
+                  <input type="text" id="c-account" name="account" placeholder="4276 **** **** 1234">
+                </div>
+              </div>
+
             </div>
           </div>
         </form>
@@ -1607,6 +1776,9 @@
       <div class="tab-panel" id="panel-act" role="tabpanel">
         <form id="form-act">
           <div class="form-grid">
+
+            <div class="form-section-label">Стороны</div>
+
             <div class="form-group">
               <label for="a-executor">ФИО исполнителя</label>
               <input type="text" id="a-executor" name="executor" placeholder="Иванов Иван Иванович" required>
@@ -1615,16 +1787,11 @@
               <label for="a-client">ФИО / название заказчика</label>
               <input type="text" id="a-client" name="client" placeholder="ООО «Ромашка»" required>
             </div>
-            <div class="form-group">
-              <label for="a-contract-num">№ договора (если есть)</label>
-              <input type="text" id="a-contract-num" name="contractNum" placeholder="47">
-            </div>
-            <div class="form-group">
-              <label for="a-contract-date">Дата договора</label>
-              <input type="text" id="a-contract-date" name="contractDate" placeholder="01.06.2026">
-            </div>
+
+            <div class="form-section-label">Работы и оплата</div>
+
             <div class="form-group full">
-              <label for="a-work">Описание выполненных работ / услуг</label>
+              <label for="a-work">Что сделано</label>
               <textarea id="a-work" name="work" placeholder="Разработан лендинг, свёрстан адаптивный макет, подключена аналитика" required></textarea>
             </div>
             <div class="form-group">
@@ -1632,8 +1799,62 @@
               <input type="number" id="a-amount" name="amount" placeholder="85000" min="1" required>
             </div>
             <div class="form-group">
-              <label for="a-date">Дата подписания акта</label>
+              <label for="a-date">Дата акта</label>
               <input type="date" id="a-date" name="date" required>
+            </div>
+
+            <div class="form-section-label">Опции акта</div>
+
+            <div class="opt-group">
+
+              <label class="opt-toggle is-on" id="opt-a-contract" data-opt="a-contract">
+                <div class="opt-toggle-switch"></div>
+                <div class="opt-toggle-label">
+                  Ссылка на договор
+                  <div class="opt-toggle-desc">Указать номер и дату договора в акте</div>
+                </div>
+              </label>
+              <div class="opt-field is-visible" id="field-a-contract">
+                <div class="form-group">
+                  <label for="a-contract-num">№ договора</label>
+                  <input type="text" id="a-contract-num" name="contractNum" placeholder="47">
+                </div>
+                <div class="form-group">
+                  <label for="a-contract-date">Дата договора</label>
+                  <input type="text" id="a-contract-date" name="contractDate" placeholder="01.06.2026">
+                </div>
+              </div>
+
+              <label class="opt-toggle is-on" id="opt-a-nopretension" data-opt="a-nopretension">
+                <div class="opt-toggle-switch"></div>
+                <div class="opt-toggle-label">
+                  Фраза «претензий не имею»
+                  <div class="opt-toggle-desc">Заказчик подтверждает принятие без претензий</div>
+                </div>
+              </label>
+
+              <label class="opt-toggle is-on" id="opt-a-auto-accept" data-opt="a-auto-accept">
+                <div class="opt-toggle-switch"></div>
+                <div class="opt-toggle-label">
+                  Автоматическая приёмка
+                  <div class="opt-toggle-desc">Через 5 дней без ответа — акт считается подписанным</div>
+                </div>
+              </label>
+
+              <label class="opt-toggle" id="opt-a-partial" data-opt="a-partial">
+                <div class="opt-toggle-switch"></div>
+                <div class="opt-toggle-label">
+                  Частичная оплата
+                  <div class="opt-toggle-desc">Указать сколько уже оплачено и сколько осталось</div>
+                </div>
+              </label>
+              <div class="opt-field" id="field-a-partial">
+                <div class="form-group">
+                  <label for="a-paid">Уже оплачено, ₽</label>
+                  <input type="number" id="a-paid" name="paid" placeholder="42500" min="0">
+                </div>
+              </div>
+
             </div>
           </div>
         </form>
@@ -1643,6 +1864,24 @@
       <div class="tab-panel" id="panel-kp" role="tabpanel">
         <form id="form-kp">
           <div class="form-grid">
+
+            <div class="form-section-label">Стороны</div>
+
+            <div class="form-group">
+              <label for="k-executor">Ваше имя</label>
+              <input type="text" id="k-executor" name="executor" placeholder="Иван Иванов" required>
+            </div>
+            <div class="form-group">
+              <label for="k-client">Имя / компания клиента</label>
+              <input type="text" id="k-client" name="client" placeholder="Алексей Петров" required>
+            </div>
+            <div class="form-group">
+              <label for="k-contact">Ваш контакт</label>
+              <input type="text" id="k-contact" name="contact" placeholder="+7 900 000-00-00 / @username">
+            </div>
+
+            <div class="form-section-label">Услуга</div>
+
             <div class="form-group full">
               <label for="k-title">Название услуги / проекта</label>
               <input type="text" id="k-title" name="title" placeholder="Разработка лендинга" required>
@@ -1659,21 +1898,55 @@
               <label for="k-term">Срок выполнения</label>
               <input type="text" id="k-term" name="term" placeholder="14 рабочих дней" required>
             </div>
-            <div class="form-group">
-              <label for="k-client">Имя / компания клиента</label>
-              <input type="text" id="k-client" name="client" placeholder="Алексей Петров" required>
-            </div>
-            <div class="form-group">
-              <label for="k-executor">Ваше имя</label>
-              <input type="text" id="k-executor" name="executor" placeholder="Иван Иванов" required>
-            </div>
-            <div class="form-group">
-              <label for="k-contact">Ваш контакт</label>
-              <input type="text" id="k-contact" name="contact" placeholder="тел. +7 900 000-00-00 / @username">
-            </div>
-            <div class="form-group">
-              <label for="k-valid">КП действует до</label>
-              <input type="text" id="k-valid" name="valid" placeholder="30.06.2026">
+
+            <div class="form-section-label">Опции КП</div>
+
+            <div class="opt-group">
+
+              <label class="opt-toggle is-on" id="opt-k-valid" data-opt="k-valid">
+                <div class="opt-toggle-switch"></div>
+                <div class="opt-toggle-label">
+                  Срок действия предложения
+                  <div class="opt-toggle-desc">До какой даты актуально КП</div>
+                </div>
+              </label>
+              <div class="opt-field is-visible" id="field-k-valid">
+                <div class="form-group">
+                  <label for="k-valid">Действует до</label>
+                  <input type="text" id="k-valid" name="valid" placeholder="30.06.2026">
+                </div>
+              </div>
+
+              <label class="opt-toggle is-on" id="opt-k-process" data-opt="k-process">
+                <div class="opt-toggle-switch"></div>
+                <div class="opt-toggle-label">
+                  Этапы работы
+                  <div class="opt-toggle-desc">Показать порядок работы: ТЗ → предоплата → сдача → акт</div>
+                </div>
+              </label>
+
+              <label class="opt-toggle is-on" id="opt-k-legal" data-opt="k-legal">
+                <div class="opt-toggle-switch"></div>
+                <div class="opt-toggle-label">
+                  Блок «Работаю официально»
+                  <div class="opt-toggle-desc">Упомянуть самозанятость, чек и закрывающие документы</div>
+                </div>
+              </label>
+
+              <label class="opt-toggle" id="opt-k-guarantee" data-opt="k-guarantee">
+                <div class="opt-toggle-switch"></div>
+                <div class="opt-toggle-label">
+                  Гарантия / правки
+                  <div class="opt-toggle-desc">Добавить поле с описанием гарантии и правок</div>
+                </div>
+              </label>
+              <div class="opt-field" id="field-k-guarantee">
+                <div class="form-group">
+                  <label for="k-guarantee">Гарантия и правки</label>
+                  <input type="text" id="k-guarantee" name="guarantee" placeholder="2 раунда правок, гарантия 30 дней">
+                </div>
+              </div>
+
             </div>
           </div>
         </form>
@@ -1836,6 +2109,65 @@
           var next = document.documentElement.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
           localStorage.setItem(THEME_KEY, next);
           applyTheme(next);
+        });
+      })();
+
+      // === OPTION TOGGLES ===
+      (function() {
+        function initToggles() {
+          document.querySelectorAll('.opt-toggle').forEach(function(toggle) {
+            toggle.addEventListener('click', function() {
+              var isOn = toggle.classList.toggle('is-on');
+              var opt = toggle.dataset.opt;
+              var field = document.getElementById('field-' + opt);
+              if (field) {
+                if (isOn) field.classList.add('is-visible');
+                else field.classList.remove('is-visible');
+                // Disable/enable inputs inside
+                field.querySelectorAll('input,textarea,select').forEach(function(el) {
+                  el.disabled = !isOn;
+                });
+              }
+            });
+            // Init state for fields that start ON
+            var opt = toggle.dataset.opt;
+            var field = document.getElementById('field-' + opt);
+            if (field && !toggle.classList.contains('is-on')) {
+              field.querySelectorAll('input,textarea,select').forEach(function(el) {
+                el.disabled = true;
+              });
+            }
+          });
+        }
+        initToggles();
+
+        // === AMOUNT PREVIEW (договор) ===
+        function updateAmountPreview() {
+          var amountEl = document.getElementById('c-amount');
+          var prepayEl = document.getElementById('c-prepay-pct');
+          var preview = document.getElementById('c-amount-preview');
+          var prepayToggle = document.getElementById('opt-c-prepay');
+          if (!amountEl || !prepayEl || !preview) return;
+          var amount = parseFloat(amountEl.value);
+          var pct = parseInt(prepayEl.value, 10);
+          if (amount > 0 && pct > 0 && pct < 100 && prepayToggle && prepayToggle.classList.contains('is-on')) {
+            var pre = Math.round(amount * pct / 100);
+            var rest = amount - pre;
+            document.getElementById('c-preview-prepay').textContent = pre.toLocaleString('ru-RU') + ' ₽';
+            document.getElementById('c-preview-rest').textContent = rest.toLocaleString('ru-RU') + ' ₽';
+            preview.classList.add('is-visible');
+          } else {
+            preview.classList.remove('is-visible');
+          }
+        }
+        var amountEl = document.getElementById('c-amount');
+        var prepayEl = document.getElementById('c-prepay-pct');
+        if (amountEl) amountEl.addEventListener('input', updateAmountPreview);
+        if (prepayEl) prepayEl.addEventListener('input', updateAmountPreview);
+        document.querySelectorAll('.opt-toggle').forEach(function(t) {
+          t.addEventListener('click', function() {
+            setTimeout(updateAmountPreview, 50);
+          });
         });
       })();
 
@@ -2226,70 +2558,105 @@
         var num = docNum();
         var amount = formatMoney(d.amount);
         var words = amountWords(d.amount);
-        var prepay = parseInt(d.prepay || 50, 10);
-        var prepayAmt = formatMoney(Math.round(d.amount * prepay / 100));
-        var finalAmt = formatMoney(Math.round(d.amount * (100 - prepay) / 100));
+        var prepayOn = document.getElementById('opt-c-prepay') && document.getElementById('opt-c-prepay').classList.contains('is-on');
+        var penaltyOn = document.getElementById('opt-c-penalty') && document.getElementById('opt-c-penalty').classList.contains('is-on');
+        var ndaOn = document.getElementById('opt-c-nda') && document.getElementById('opt-c-nda').classList.contains('is-on');
+        var portfolioOn = document.getElementById('opt-c-portfolio') && document.getElementById('opt-c-portfolio').classList.contains('is-on');
+        var ipOn = document.getElementById('opt-c-ip') && document.getElementById('opt-c-ip').classList.contains('is-on');
+        var bankOn = document.getElementById('opt-c-remote') && document.getElementById('opt-c-remote').classList.contains('is-on');
+
         var innExec = d.executorInn ? ', ИНН ' + esc(d.executorInn) : '';
         var innClient = d.clientInn ? ', ИНН ' + esc(d.clientInn) : '';
-        var contactStr = d.executorContact ? '<p>Контакт Исполнителя: ' + esc(d.executorContact) + '</p>' : '';
-        var prepayBlock = prepay > 0 && prepay < 100
-          ? '<p>2.2. Оплата производится в два этапа: предоплата в размере ' + prepay + '% (' + prepayAmt + ') — в течение 3 (трёх) рабочих дней с момента подписания настоящего Договора; остаток ' + (100-prepay) + '% (' + finalAmt + ') — в течение 3 (трёх) рабочих дней с момента подписания Акта оказанных услуг.</p>'
-          : prepay === 100
-          ? '<p>2.2. Полная предоплата в размере ' + amount + ' (' + words + ') производится в течение 3 (трёх) рабочих дней с момента подписания настоящего Договора.</p>'
-          : '<p>2.2. Оплата в полном объёме производится в течение 5 (пяти) рабочих дней с момента подписания Акта оказанных услуг.</p>';
+
+        // Оплата
+        var payBlock = '';
+        if (prepayOn && d.prepay && parseInt(d.prepay) > 0 && parseInt(d.prepay) < 100) {
+          var pct = parseInt(d.prepay);
+          var preAmt = formatMoney(Math.round(d.amount * pct / 100));
+          var restAmt = formatMoney(Math.round(d.amount * (100 - pct) / 100));
+          payBlock = '<p>2.2. Оплата производится в два этапа:</p>'
+            + '<p>— предоплата ' + pct + '% (' + preAmt + ') — в течение 3 (трёх) рабочих дней с момента подписания Договора;</p>'
+            + '<p>— остаток ' + (100-pct) + '% (' + restAmt + ') — в течение 3 (трёх) рабочих дней после подписания Акта оказанных услуг.</p>';
+        } else {
+          payBlock = '<p>2.2. Оплата в полном объёме производится в течение 5 (пяти) рабочих дней с момента подписания Акта оказанных услуг.</p>';
+        }
+
+        // Банковские реквизиты
+        var bankBlock = '';
+        if (bankOn && (d.bank || d.account)) {
+          bankBlock = '<p>2.4. Реквизиты Исполнителя для оплаты: '
+            + (d.bank ? 'Банк: ' + esc(d.bank) + '. ' : '')
+            + (d.account ? 'Счёт / карта: ' + esc(d.account) + '.' : '') + '</p>';
+        }
+
+        // Ответственность
+        var penaltyBlock = penaltyOn
+          ? '<div class="doc-section"><h2>6. Ответственность сторон</h2>'
+            + '<p>6.1. За просрочку оплаты Заказчик уплачивает пеню в размере 0,1% от неоплаченной суммы за каждый день просрочки.</p>'
+            + '<p>6.2. За просрочку сдачи по вине Исполнителя Исполнитель уплачивает пеню в размере 0,1% от стоимости Услуг за каждый день просрочки, но не более 10% от общей стоимости.</p>'
+            + '<p>6.3. Стороны освобождаются от ответственности при наступлении обстоятельств непреодолимой силы.</p>'
+            + '</div>'
+          : '';
+
+        // NDA
+        var ndaBlock = ndaOn
+          ? '<div class="doc-section"><h2>' + (penaltyOn ? '7' : '6') + '. Конфиденциальность</h2>'
+            + '<p>Стороны обязуются не разглашать третьим лицам конфиденциальную информацию, полученную в ходе исполнения настоящего Договора, без письменного согласия другой Стороны. Обязательство действует в течение 2 лет после окончания Договора.</p>'
+            + (portfolioOn ? '<p>Исполнитель вправе указывать факт сотрудничества с Заказчиком в своём портфолио, если Заказчик не направил письменный запрет в течение 5 дней с момента подписания Договора.</p>' : '')
+            + '</div>'
+          : '';
+
+        // IP
+        var ipBlock = ipOn
+          ? '<p>4.5. Исключительные права на результат интеллектуальной деятельности, созданный в рамках настоящего Договора, переходят к Заказчику в полном объёме с момента получения Исполнителем полной оплаты.</p>'
+          : '';
+
+        var sectionNum = 6 + (penaltyOn ? 1 : 0) + (ndaOn ? 1 : 0);
 
         return ''
           + '<div class="doc-header"><h1>Договор оказания услуг</h1><div class="doc-num">№ ' + num + '</div></div>'
           + '<div class="doc-meta">г. ' + esc(d.city) + ', ' + dateStr + '</div>'
           + '<div class="doc-parties">'
-          + '<p><strong>' + esc(d.executor) + '</strong>' + innExec + ', являющийся плательщиком налога на профессиональный доход (самозанятый), именуемый(ая) в дальнейшем «Исполнитель», с одной стороны, и</p>'
-          + '<p><strong>' + esc(d.client) + '</strong>' + innClient + ', именуемый(ая) в дальнейшем «Заказчик», с другой стороны,</p>'
+          + '<p><strong>' + esc(d.executor) + '</strong>' + innExec + ', являющийся плательщиком налога на профессиональный доход (самозанятый), именуемый(ая) далее «Исполнитель», с одной стороны, и</p>'
+          + '<p><strong>' + esc(d.client) + '</strong>' + innClient + ', именуемый(ая) далее «Заказчик», с другой стороны,</p>'
           + '<p>совместно именуемые «Стороны», заключили настоящий Договор о нижеследующем:</p>'
           + '</div>'
           + '<div class="doc-section"><h2>1. Предмет договора</h2>'
-          + '<p>1.1. Исполнитель обязуется по заданию Заказчика оказать следующие услуги: <strong>' + esc(d.service) + '</strong> (далее — «Услуги»), а Заказчик обязуется принять и оплатить Услуги в соответствии с условиями настоящего Договора.</p>'
-          + '<p>1.2. Услуги оказываются дистанционно с использованием средств электронной связи, если иное не согласовано Сторонами дополнительно в письменной форме.</p>'
-          + '<p>1.3. Результат оказания Услуг передаётся Заказчику в электронном виде, если иное не предусмотрено дополнительным соглашением Сторон.</p>'
+          + '<p>1.1. Исполнитель обязуется оказать Заказчику следующие услуги: <strong>' + esc(d.service) + '</strong> (далее — «Услуги»), а Заказчик обязуется принять и оплатить Услуги.</p>'
+          + '<p>1.2. Услуги оказываются дистанционно, если иное не согласовано Сторонами письменно.</p>'
           + '</div>'
           + '<div class="doc-section"><h2>2. Стоимость и порядок оплаты</h2>'
-          + '<p>2.1. Стоимость Услуг по настоящему Договору составляет <strong>' + amount + '</strong> (' + words + '). НДС не облагается в связи с применением Исполнителем специального налогового режима «Налог на профессиональный доход» (ч. 9 ст. 2 Федерального закона № 422-ФЗ от 27.11.2018).</p>'
-          + prepayBlock
-          + '<p>2.3. Оплата производится безналичным переводом на реквизиты Исполнителя или иным согласованным Сторонами способом. Исполнитель выдаёт чек через приложение «Мой налог» в день получения оплаты.</p>'
+          + '<p>2.1. Стоимость Услуг составляет <strong>' + amount + '</strong> (' + words + '). НДС не облагается (самозанятый, ФЗ № 422-ФЗ от 27.11.2018).</p>'
+          + payBlock
+          + '<p>2.3. Исполнитель выдаёт чек через приложение «Мой налог» в день получения оплаты.</p>'
+          + bankBlock
           + '</div>'
-          + '<div class="doc-section"><h2>3. Сроки оказания услуг</h2>'
+          + '<div class="doc-section"><h2>3. Сроки</h2>'
           + '<p>3.1. Исполнитель обязуется оказать Услуги в срок до <strong>' + esc(d.deadline) + '</strong>.</p>'
-          + '<p>3.2. Срок может быть продлён по письменному (в т. ч. электронному) соглашению Сторон в случае непредоставления Заказчиком необходимых материалов или информации в установленные сроки.</p>'
-          + '<p>3.3. Датой исполнения обязательств Исполнителя считается дата подписания обеими Сторонами Акта оказанных услуг.</p>'
+          + '<p>3.2. Срок может быть продлён по письменному соглашению Сторон.</p>'
+          + '<p>3.3. Датой исполнения считается дата подписания Акта оказанных услуг.</p>'
           + '</div>'
-          + '<div class="doc-section"><h2>4. Права и обязанности сторон</h2>'
-          + '<p>4.1. Исполнитель обязуется: оказать Услуги качественно, в установленные сроки и в соответствии с требованиями Заказчика; информировать Заказчика о ходе выполнения работ по его запросу; устранять выявленные недостатки в разумный срок, если они возникли по вине Исполнителя.</p>'
-          + '<p>4.2. Заказчик обязуется: своевременно предоставить Исполнителю все необходимые материалы, доступы и информацию; принять результат Услуг в течение 5 (пяти) рабочих дней с момента уведомления о готовности; произвести оплату в установленные настоящим Договором сроки.</p>'
-          + '<p>4.3. Если в течение 5 (пяти) рабочих дней после уведомления Заказчик не подписал Акт и не направил мотивированного отказа — Услуги считаются принятыми, Акт — подписанным в одностороннем порядке.</p>'
-          + '<p>4.4. Исключительное право на результат интеллектуальной деятельности переходит к Заказчику в полном объёме с момента получения Исполнителем полной оплаты по настоящему Договору.</p>'
+          + '<div class="doc-section"><h2>4. Права и обязанности</h2>'
+          + '<p>4.1. Исполнитель обязуется оказать Услуги качественно и в срок; информировать Заказчика о ходе работ по запросу.</p>'
+          + '<p>4.2. Заказчик обязуется предоставить необходимые материалы и информацию; принять результат в течение 5 рабочих дней с момента уведомления о готовности; произвести оплату в установленные сроки.</p>'
+          + '<p>4.3. Если в течение 5 рабочих дней Заказчик не подписал Акт и не направил мотивированного отказа — Услуги считаются принятыми, Акт подписанным в одностороннем порядке.</p>'
+          + ipBlock
           + '</div>'
-          + '<div class="doc-section"><h2>5. Конфиденциальность</h2>'
-          + '<p>5.1. Стороны обязуются не разглашать третьим лицам конфиденциальную информацию, полученную в ходе исполнения настоящего Договора, без письменного согласия другой Стороны.</p>'
-          + '<p>5.2. Исполнитель вправе указывать факт сотрудничества с Заказчиком в своём портфолио, если Заказчик не направил письменный запрет в течение 5 дней с момента подписания настоящего Договора.</p>'
+          + '<div class="doc-section"><h2>5. Разрешение споров</h2>'
+          + '<p>5.1. Стороны урегулируют споры путём переговоров. Срок рассмотрения претензии — 10 рабочих дней.</p>'
+          + '<p>5.2. При недостижении согласия — в суде общей юрисдикции по месту нахождения Исполнителя.</p>'
           + '</div>'
-          + '<div class="doc-section"><h2>6. Ответственность сторон</h2>'
-          + '<p>6.1. За просрочку оплаты Заказчик уплачивает пеню в размере 0,1% от неоплаченной суммы за каждый день просрочки.</p>'
-          + '<p>6.2. За просрочку исполнения Услуг по вине Исполнителя Исполнитель уплачивает пеню в размере 0,1% от стоимости Услуг за каждый день просрочки, но не более 10% от общей стоимости Договора.</p>'
-          + '<p>6.3. Стороны освобождаются от ответственности при наступлении обстоятельств непреодолимой силы (форс-мажор).</p>'
-          + '</div>'
-          + '<div class="doc-section"><h2>7. Порядок разрешения споров</h2>'
-          + '<p>7.1. Все споры и разногласия Стороны урегулируют путём переговоров. Срок рассмотрения претензии — 10 (десять) рабочих дней с момента её получения.</p>'
-          + '<p>7.2. При недостижении согласия спор передаётся на рассмотрение в суд общей юрисдикции по месту нахождения Исполнителя в соответствии с законодательством РФ.</p>'
-          + '</div>'
-          + '<div class="doc-section"><h2>8. Заключительные положения</h2>'
-          + '<p>8.1. Настоящий Договор вступает в силу с момента подписания и действует до полного исполнения Сторонами своих обязательств.</p>'
-          + '<p>8.2. Любые изменения и дополнения к Договору действительны только при оформлении их в письменном виде и подписании обеими Сторонами.</p>'
-          + '<p>8.3. Договор составлен в двух экземплярах, имеющих одинаковую юридическую силу, по одному для каждой из Сторон. Подписанный скан-образ документа, направленный по электронной почте, имеет юридическую силу оригинала до обмена оригиналами.</p>'
+          + penaltyBlock
+          + ndaBlock
+          + '<div class="doc-section"><h2>' + sectionNum + '. Заключительные положения</h2>'
+          + '<p>' + sectionNum + '.1. Договор вступает в силу с момента подписания и действует до полного исполнения обязательств.</p>'
+          + '<p>' + sectionNum + '.2. Изменения действительны только в письменной форме с подписями обеих Сторон.</p>'
+          + '<p>' + sectionNum + '.3. Договор составлен в двух экземплярах. Скан-образ с подписью имеет юридическую силу оригинала.</p>'
           + '</div>'
           + '<div class="doc-signatures">'
           + '<div class="doc-sig-block">'
           + '<p><strong>Исполнитель:</strong></p>'
-          + '<p>' + esc(d.executor) + (d.executorInn ? '<br>ИНН: ' + esc(d.executorInn) : '') + '</p>'
-          + (d.executorContact ? '<p>' + esc(d.executorContact) + '</p>' : '')
+          + '<p>' + esc(d.executor) + (d.executorInn ? '<br>ИНН: ' + esc(d.executorInn) : '') + (d.executorContact ? '<br>' + esc(d.executorContact) : '') + '</p>'
           + '<div class="doc-sig-line"></div><p>подпись / дата</p>'
           + '</div>'
           + '<div class="doc-sig-block">'
@@ -2306,11 +2673,24 @@
         var actDateStr = formatDateRu(actDate);
         var amount = formatMoney(d.amount);
         var words = amountWords(d.amount);
-        var contractRef = (d.contractNum && d.contractDate)
-          ? 'к Договору оказания услуг № ' + esc(d.contractNum) + ' от ' + esc(d.contractDate)
-          : d.contractNum
-          ? 'к Договору оказания услуг № ' + esc(d.contractNum)
-          : '';
+
+        var contractOn = document.getElementById('opt-a-contract') && document.getElementById('opt-a-contract').classList.contains('is-on');
+        var nopretOn = document.getElementById('opt-a-nopretension') && document.getElementById('opt-a-nopretension').classList.contains('is-on');
+        var autoOn = document.getElementById('opt-a-auto-accept') && document.getElementById('opt-a-auto-accept').classList.contains('is-on');
+        var partialOn = document.getElementById('opt-a-partial') && document.getElementById('opt-a-partial').classList.contains('is-on');
+
+        var contractRef = '';
+        if (contractOn && d.contractNum) {
+          contractRef = 'к Договору оказания услуг № ' + esc(d.contractNum)
+            + (d.contractDate ? ' от ' + esc(d.contractDate) : '');
+        }
+
+        var partialBlock = '';
+        if (partialOn && d.paid && parseFloat(d.paid) > 0) {
+          var paid = formatMoney(d.paid);
+          var remaining = formatMoney(Math.max(0, parseFloat(d.amount) - parseFloat(d.paid)));
+          partialBlock = '<p>2.4. Ранее Заказчиком оплачено: <strong>' + paid + '</strong>. Остаток к оплате: <strong>' + remaining + '</strong>.</p>';
+        }
 
         return ''
           + '<div class="doc-header"><h1>Акт оказанных услуг</h1><div class="doc-num">№ ' + num + '</div></div>'
@@ -2320,22 +2700,20 @@
           + '<p><strong>Заказчик:</strong> ' + esc(d.client) + '</p>'
           + (contractRef ? '<p>Настоящий Акт составлен ' + contractRef + '.</p>' : '')
           + '</div>'
-          + '<div class="doc-section"><h2>1. Перечень оказанных услуг</h2>'
+          + '<div class="doc-section"><h2>1. Оказанные услуги</h2>'
           + '<p>Исполнитель оказал, а Заказчик принял следующие услуги:</p>'
-          + '<p style="margin-top:8px"><strong>' + esc(d.work) + '</strong></p>'
+          + '<p style="margin-top:8px;padding:12px;background:rgba(99,102,241,0.05);border-left:3px solid var(--accent);border-radius:0 6px 6px 0"><strong>' + esc(d.work) + '</strong></p>'
           + '</div>'
           + '<div class="doc-section"><h2>2. Стоимость и оплата</h2>'
-          + '<p>2.1. Общая стоимость оказанных услуг составляет <strong>' + amount + '</strong> (' + words + '). НДС не облагается в связи с применением Исполнителем специального налогового режима «Налог на профессиональный доход».</p>'
-          + '<p>2.2. Услуги оказаны в полном объёме, в установленные сроки и с надлежащим качеством.</p>'
-          + '<p>2.3. Оплата производится Заказчиком в течение 3 (трёх) рабочих дней с даты подписания настоящего Акта, если иное не предусмотрено Договором.</p>'
+          + '<p>2.1. Общая стоимость оказанных услуг составляет <strong>' + amount + '</strong> (' + words + '). НДС не облагается (ФЗ № 422-ФЗ).</p>'
+          + '<p>2.2. Услуги оказаны в полном объёме и в установленные сроки.</p>'
+          + (nopretOn ? '<p>2.3. Заказчик претензий по объёму, качеству и срокам оказания услуг не имеет.</p>' : '')
+          + partialBlock
           + '</div>'
-          + '<div class="doc-section"><h2>3. Приёмка услуг</h2>'
-          + '<p>3.1. Заказчик принял оказанные услуги в полном объёме. Претензий по объёму, качеству и срокам оказания услуг Заказчик не имеет.</p>'
-          + '<p>3.2. Настоящий Акт является основанием для проведения окончательных расчётов между Сторонами по Договору.</p>'
-          + '<p>3.3. Если в течение 5 (пяти) рабочих дней с момента получения Акта Заказчик не подписал его и не направил мотивированного отказа, услуги считаются принятыми, Акт — подписанным в одностороннем порядке.</p>'
-          + '</div>'
-          + '<div class="doc-section"><h2>4. Заключительные положения</h2>'
-          + '<p>Настоящий Акт составлен в двух экземплярах, имеющих одинаковую юридическую силу, по одному для каждой из Сторон. Подписанный скан-образ имеет юридическую силу оригинала.</p>'
+          + '<div class="doc-section"><h2>3. Приёмка</h2>'
+          + '<p>3.1. Настоящий Акт является основанием для проведения окончательных расчётов между Сторонами.</p>'
+          + (autoOn ? '<p>3.2. Если в течение 5 (пяти) рабочих дней с момента получения настоящего Акта Заказчик не подписал его и не направил мотивированного отказа в письменной форме — услуги считаются принятыми, Акт считается подписанным в одностороннем порядке.</p>' : '')
+          + '<p>' + (autoOn ? '3.3' : '3.2') + '. Акт составлен в двух экземплярах. Скан-образ с подписью имеет юридическую силу оригинала.</p>'
           + '</div>'
           + '<div class="doc-signatures">'
           + '<div class="doc-sig-block"><p><strong>Исполнитель:</strong></p><p>' + esc(d.executor) + '</p><div class="doc-sig-line"></div><p>подпись / дата</p></div>'
@@ -2345,8 +2723,37 @@
 
       function buildKp(d) {
         var amount = formatMoney(d.amount);
-        var validStr = d.valid ? '<p><strong>Срок действия предложения:</strong> до ' + esc(d.valid) + '</p>' : '';
-        var contactStr = d.contact ? esc(d.contact) : '';
+        var validOn = document.getElementById('opt-k-valid') && document.getElementById('opt-k-valid').classList.contains('is-on');
+        var processOn = document.getElementById('opt-k-process') && document.getElementById('opt-k-process').classList.contains('is-on');
+        var legalOn = document.getElementById('opt-k-legal') && document.getElementById('opt-k-legal').classList.contains('is-on');
+        var guaranteeOn = document.getElementById('opt-k-guarantee') && document.getElementById('opt-k-guarantee').classList.contains('is-on');
+
+        var processBlock = processOn
+          ? '<div class="doc-section"><h2>Порядок работы</h2>'
+            + '<p>1. Обсуждаем задачу, фиксируем требования в ТЗ.</p>'
+            + '<p>2. Вы вносите предоплату — я приступаю к работе.</p>'
+            + '<p>3. Сдаю результат, вносим правки до принятия.</p>'
+            + '<p>4. Подписываем Акт оказанных услуг, финальный расчёт.</p>'
+            + '<p>5. Я выдаю чек через «Мой налог» — всё официально.</p>'
+            + '</div>'
+          : '';
+
+        var legalBlock = legalOn
+          ? '<div class="doc-section"><h2>Работаю официально</h2>'
+            + '<p>Я самозанятый (плательщик НПД). Это значит:</p>'
+            + '<p>— вы получаете <strong>договор, акт и чек</strong> — полный пакет закрывающих документов;</p>'
+            + '<p>— расходы можно включить в затраты компании;</p>'
+            + '<p>— никаких серых схем и рисков для вашей бухгалтерии.</p>'
+            + '</div>'
+          : '';
+
+        var guaranteeBlock = (guaranteeOn && d.guarantee)
+          ? '<div class="doc-section"><h2>Гарантия и правки</h2><p>' + esc(d.guarantee) + '</p></div>'
+          : '';
+
+        var validBlock = (validOn && d.valid)
+          ? '<div class="doc-section"><p><strong>Предложение действительно до: ' + esc(d.valid) + '</strong></p></div>'
+          : '';
 
         return ''
           + '<div class="doc-kp-header">'
@@ -2354,32 +2761,23 @@
           + '<p>' + esc(d.title) + '</p>'
           + '</div>'
           + '<p>Уважаемый(ая) <strong>' + esc(d.client) + '</strong>,</p>'
-          + '<p style="margin-top:12px">предлагаю Вашему вниманию коммерческое предложение по услуге <strong>«' + esc(d.title) + '»</strong>. Ниже — подробное описание, стоимость и условия работы.</p>'
-          + '<div class="doc-section" style="margin-top:24px"><h2>Что входит в работу</h2>'
+          + '<p style="margin-top:10px">предлагаю Вашему вниманию коммерческое предложение по услуге <strong>«' + esc(d.title) + '»</strong>.</p>'
+          + '<div class="doc-section" style="margin-top:20px"><h2>Что входит в работу</h2>'
           + '<p>' + esc(d.description) + '</p>'
           + '</div>'
           + '<div class="doc-kp-price">'
-          + '<div class="price-label">Стоимость услуги</div>'
+          + '<div class="price-label">Стоимость</div>'
           + '<div class="price-value">' + amount + '</div>'
-          + '<div style="font-size:12px;color:#888;margin-top:4px">НДС не облагается (самозанятый, ФЗ № 422)</div>'
+          + '<div style="font-size:12px;color:#888;margin-top:4px">НДС не облагается — самозанятый, ФЗ № 422</div>'
           + '</div>'
-          + '<div class="doc-section"><h2>Сроки выполнения</h2>'
-          + '<p>' + esc(d.term) + '</p>'
-          + '</div>'
-          + '<div class="doc-section"><h2>Порядок работы</h2>'
-          + '<p>1. Согласование технического задания и деталей проекта.</p>'
-          + '<p>2. Внесение предоплаты (по договорённости) — начало работы.</p>'
-          + '<p>3. Сдача результата, правки, финальная приёмка.</p>'
-          + '<p>4. Подписание Акта оказанных услуг, финальный расчёт.</p>'
-          + '<p>5. Исполнитель выдаёт чек через «Мой налог» — всё легально.</p>'
-          + '</div>'
-          + '<div class="doc-section"><h2>Почему я</h2>'
-          + '<p>Работаю официально как самозанятый — вы получаете закрывающие документы (договор, акт, чек) и можете включить расходы в затраты. Никаких серых схем.</p>'
-          + '</div>'
-          + (validStr ? '<div class="doc-section">' + validStr + '</div>' : '')
-          + '<p style="margin-top:24px">Готов приступить к работе после согласования деталей. Пишите — отвечу быстро.</p>'
+          + '<div class="doc-section"><h2>Срок выполнения</h2><p><strong>' + esc(d.term) + '</strong></p></div>'
+          + processBlock
+          + guaranteeBlock
+          + legalBlock
+          + validBlock
+          + '<p style="margin-top:20px">Готов приступить к работе после согласования деталей. Пишите — отвечу быстро.</p>'
           + '<div class="doc-kp-footer">'
-          + '<div><strong>' + esc(d.executor) + '</strong><br>Исполнитель, самозанятый' + (contactStr ? '<br>' + contactStr : '') + '</div>'
+          + '<div><strong>' + esc(d.executor) + '</strong><br>Исполнитель, самозанятый' + (d.contact ? '<br>' + esc(d.contact) : '') + '</div>'
           + '<div style="text-align:right">' + dateStr + '</div>'
           + '</div>';
       }
