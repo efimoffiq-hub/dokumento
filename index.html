@@ -42,6 +42,44 @@
       --green: #16a34a;
     }
 
+    /* ── Verification step ──────────────────────── */
+    .verify-step {
+      display: none;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .verify-step.is-visible { display: flex; }
+    .verify-email-hint {
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      text-align: center;
+      line-height: 1.5;
+    }
+    .verify-email-hint strong { color: var(--text); }
+    .code-input-wrap {
+      display: flex;
+      gap: 8px;
+    }
+    .code-input-wrap input {
+      flex: 1;
+      font-size: 1.5rem;
+      font-weight: 700;
+      letter-spacing: 0.2em;
+      text-align: center;
+    }
+    .verify-resend {
+      background: none;
+      border: none;
+      color: var(--accent-light);
+      font-size: 0.82rem;
+      cursor: pointer;
+      text-align: center;
+      padding: 0;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+    .verify-resend:disabled { color: var(--text-muted); text-decoration: none; cursor: default; }
+
     /* ── Option toggles ─────────────────────────── */
     .opt-group {
       grid-column: 1 / -1;
@@ -1611,8 +1649,9 @@
       </div>
 
       <div class="tab-panel" id="panel-auth-register" role="tabpanel">
+        <!-- Шаг 1: email + пароль -->
         <form id="form-register">
-          <div class="form-grid">
+          <div class="form-grid" id="register-fields">
             <div class="form-group full">
               <label for="register-email">Email</label>
               <input type="email" id="register-email" name="email" placeholder="you@example.com" required>
@@ -1623,6 +1662,17 @@
             </div>
           </div>
         </form>
+
+        <!-- Шаг 2: код из письма -->
+        <div class="verify-step" id="verify-step">
+          <p class="verify-email-hint">Отправили код на <strong id="verify-email-shown"></strong><br>Проверьте папку «Спам» если нет во входящих</p>
+          <div class="code-input-wrap">
+            <input type="text" id="verify-code" placeholder="000000" maxlength="6" inputmode="numeric" autocomplete="one-time-code">
+          </div>
+          <button type="button" class="verify-resend" id="btn-resend" disabled>
+            Отправить код повторно (<span id="resend-timer">60</span>с)
+          </button>
+        </div>
       </div>
 
       <div class="form-error" id="auth-error"></div>
@@ -2308,6 +2358,7 @@
 
       function switchAuthTab(name) {
         activeAuthTab = name;
+        if (name === 'register') resetRegisterStep();
         authTabs.forEach(function (t) {
           var active = t.dataset.authTab === name;
           t.classList.toggle('is-active', active);
@@ -2340,41 +2391,151 @@
         document.getElementById('generator-error').classList.remove('is-visible');
       }
 
+      var registerStep = 1; // 1 = email/pass, 2 = код
+      var registerEmail = '';
+      var resendInterval = null;
+
+      function startResendTimer() {
+        var secs = 60;
+        var btn = document.getElementById('btn-resend');
+        var timerEl = document.getElementById('resend-timer');
+        btn.disabled = true;
+        timerEl.textContent = secs;
+        clearInterval(resendInterval);
+        resendInterval = setInterval(function() {
+          secs--;
+          timerEl.textContent = secs;
+          if (secs <= 0) {
+            clearInterval(resendInterval);
+            btn.disabled = false;
+            btn.textContent = 'Отправить код повторно';
+          }
+        }, 1000);
+      }
+
+      function showVerifyStep(email) {
+        registerStep = 2;
+        registerEmail = email;
+        document.getElementById('register-fields').style.display = 'none';
+        document.getElementById('verify-step').classList.add('is-visible');
+        document.getElementById('verify-email-shown').textContent = email;
+        document.getElementById('btn-auth-submit').textContent = 'Подтвердить';
+        document.getElementById('verify-code').focus();
+        startResendTimer();
+      }
+
+      function resetRegisterStep() {
+        registerStep = 1;
+        registerEmail = '';
+        document.getElementById('register-fields').style.display = '';
+        document.getElementById('verify-step').classList.remove('is-visible');
+        document.getElementById('verify-code').value = '';
+        document.getElementById('btn-auth-submit').textContent = 'Зарегистрироваться';
+        clearInterval(resendInterval);
+      }
+
+      document.getElementById('btn-resend').addEventListener('click', async function() {
+        if (!registerEmail) return;
+        var btn = this;
+        btn.disabled = true;
+        hideAuthError();
+        try {
+          var result = await apiFetch('/api/verify/send', {
+            method: 'POST',
+            body: JSON.stringify({ email: registerEmail }),
+            auth: false,
+          });
+          if (!result.res.ok) {
+            showAuthError(result.data.error || 'Ошибка отправки');
+          } else {
+            startResendTimer();
+          }
+        } catch(e) {
+          showAuthError('Ошибка сети');
+          btn.disabled = false;
+        }
+      });
+
       async function submitAuth() {
-        var form = document.getElementById('form-' + activeAuthTab);
-        if (!form.reportValidity()) return;
-
-        var data = Object.fromEntries(new FormData(form));
         var btn = document.getElementById('btn-auth-submit');
-        var endpoint = activeAuthTab === 'login' ? '/api/login' : '/api/register';
-
         btn.disabled = true;
         hideAuthError();
 
-        try {
-          var result = await apiFetch(endpoint, {
-            method: 'POST',
-            body: JSON.stringify(data),
-            auth: false,
-          });
+        // Логин
+        if (activeAuthTab === 'login') {
+          var form = document.getElementById('form-login');
+          if (!form.reportValidity()) { btn.disabled = false; return; }
+          var data = Object.fromEntries(new FormData(form));
+          try {
+            var result = await apiFetch('/api/login', {
+              method: 'POST',
+              body: JSON.stringify(data),
+              auth: false,
+            });
+            if (!result.res.ok) { showAuthError(result.data.error || 'Ошибка входа'); return; }
+            setToken(result.data.token);
+            currentUser = result.data.user;
+            updateHeader();
+            closeAuthModal();
+            if (openGeneratorAfterAuth) openGeneratorModal();
+          } catch(e) {
+            showAuthError('Не удалось связаться с сервером');
+          } finally {
+            btn.disabled = false;
+          }
+          return;
+        }
 
-          if (!result.res.ok) {
-            showAuthError(result.data.error || 'Ошибка авторизации');
+        // Регистрация — шаг 1: отправить код
+        if (activeAuthTab === 'register' && registerStep === 1) {
+          var form = document.getElementById('form-register');
+          if (!form.reportValidity()) { btn.disabled = false; return; }
+          var data = Object.fromEntries(new FormData(form));
+          try {
+            var result = await apiFetch('/api/verify/send', {
+              method: 'POST',
+              body: JSON.stringify({ email: data.email }),
+              auth: false,
+            });
+            if (!result.res.ok) { showAuthError(result.data.error || 'Ошибка отправки кода'); return; }
+            showVerifyStep(data.email);
+          } catch(e) {
+            showAuthError('Не удалось связаться с сервером');
+          } finally {
+            btn.disabled = false;
+          }
+          return;
+        }
+
+        // Регистрация — шаг 2: проверить код и создать аккаунт
+        if (activeAuthTab === 'register' && registerStep === 2) {
+          var code = document.getElementById('verify-code').value.trim();
+          if (!code || code.length !== 6) {
+            showAuthError('Введите 6-значный код из письма');
+            btn.disabled = false;
             return;
           }
-
-          setToken(result.data.token);
-          currentUser = result.data.user;
-          updateHeader();
-          closeAuthModal();
-
-          if (openGeneratorAfterAuth) {
-            openGeneratorModal();
+          var form = document.getElementById('form-register');
+          var data = Object.fromEntries(new FormData(form));
+          try {
+            var result = await apiFetch('/api/register', {
+              method: 'POST',
+              body: JSON.stringify({ email: registerEmail, password: data.password, code: code }),
+              auth: false,
+            });
+            if (!result.res.ok) { showAuthError(result.data.error || 'Ошибка регистрации'); return; }
+            setToken(result.data.token);
+            currentUser = result.data.user;
+            resetRegisterStep();
+            updateHeader();
+            closeAuthModal();
+            if (openGeneratorAfterAuth) openGeneratorModal();
+          } catch(e) {
+            showAuthError('Не удалось связаться с сервером');
+          } finally {
+            btn.disabled = false;
           }
-        } catch (e) {
-          showAuthError('Не удалось связаться с сервером. Запустите npm start');
-        } finally {
-          btn.disabled = false;
+          return;
         }
       }
 
