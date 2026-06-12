@@ -302,7 +302,7 @@ app.post('/api/payment/create', authMiddleware, async (req, res) => {
 
   const userId = req.user.id;
   const idempotenceKey = crypto.randomUUID();
-  const returnUrl = (req.headers.origin || 'https://dokumento-nu.vercel.app') + '/success.html';
+  const returnUrl = (req.headers.origin || 'https://mydokumento.ru') + '/success.html';
 
   try {
     const response = await fetch('https://api.yookassa.ru/v3/payments', {
