@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Пример договора — Документо</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0a0a0f; --surface: #13131a; --border: rgba(255,255,255,0.08);
+      --text: #f4f4f5; --text-muted: #a1a1aa; --accent: #6366f1;
+      --accent-light: #818cf8; --radius-lg: 20px;
+    }
+    body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); -webkit-font-smoothing: antialiased; }
+    .container { max-width: 900px; margin: 0 auto; padding: 0 24px; }
+
+    header {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      background: rgba(10,10,15,0.85); backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+    }
+    .header-inner { display: flex; align-items: center; justify-content: space-between; height: 64px; }
+    .logo { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 1.1rem; text-decoration: none; color: var(--text); }
+    .logo-icon { width: 30px; height: 30px; background: linear-gradient(135deg, var(--accent), #a855f7); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; }
+    .back-link { color: var(--text-muted); text-decoration: none; font-size: 0.88rem; font-weight: 500; transition: color 0.2s; }
+    .back-link:hover { color: var(--text); }
+
+    main { padding: 100px 0 60px; }
+
+    .page-header { text-align: center; margin-bottom: 48px; }
+    .page-header h1 { font-size: clamp(1.6rem, 4vw, 2.2rem); font-weight: 800; letter-spacing: -0.03em; margin-bottom: 12px; }
+    .page-header p { color: var(--text-muted); font-size: 1rem; }
+
+    .tabs-row {
+      display: flex; gap: 8px; margin-bottom: 32px; justify-content: center; flex-wrap: wrap;
+    }
+    .tab-btn {
+      padding: 8px 20px; border-radius: 999px; border: 1px solid var(--border);
+      background: var(--surface); color: var(--text-muted); font-size: 0.88rem;
+      font-weight: 600; cursor: pointer; transition: all 0.2s;
+    }
+    .tab-btn.is-active {
+      background: var(--accent); border-color: var(--accent); color: #fff;
+    }
+
+    .doc-wrap {
+      background: #fff; border-radius: var(--radius-lg); padding: 48px;
+      color: #1a1a2e; font-size: 14px; line-height: 1.7;
+      box-shadow: 0 8px 48px rgba(0,0,0,0.3);
+      display: none;
+    }
+    .doc-wrap.is-active { display: block; }
+
+    .doc-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; }
+    .doc-header h1 { font-size: 18px; font-weight: 800; color: #1a1a2e; }
+    .doc-num { font-size: 13px; color: #6b6b80; }
+    .doc-meta { color: #6b6b80; font-size: 13px; margin-bottom: 20px; }
+    .doc-parties { background: #f8f8fc; border-radius: 10px; padding: 16px; margin-bottom: 20px; font-size: 13px; }
+    .doc-parties p { margin-bottom: 6px; }
+    .doc-parties p:last-child { margin-bottom: 0; }
+    .doc-section { margin-bottom: 18px; }
+    .doc-section h2 { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #6366f1; margin-bottom: 10px; }
+    .doc-section p { margin-bottom: 8px; font-size: 13px; color: #333; }
+    .doc-signatures { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; margin-top: 32px; padding-top: 20px; border-top: 1px solid #e5e5ef; }
+    .doc-sig-block p { font-size: 13px; color: #444; margin-bottom: 6px; }
+    .doc-sig-line { border-bottom: 1px solid #999; margin: 20px 0 8px; }
+    .doc-kp-header { background: linear-gradient(135deg, #6366f1, #a855f7); color: #fff; margin: -48px -48px 28px; padding: 36px 48px; border-radius: var(--radius-lg) var(--radius-lg) 0 0; }
+    .doc-kp-header h1 { font-size: 20px; font-weight: 800; margin-bottom: 6px; }
+    .doc-kp-header p { font-size: 14px; opacity: 0.85; }
+    .doc-kp-price { background: #f8f8fc; border-radius: 12px; padding: 20px 24px; margin: 20px 0; display: flex; flex-direction: column; gap: 4px; }
+    .price-label { font-size: 12px; color: #888; text-transform: uppercase; letter-spacing: 0.06em; }
+    .price-value { font-size: 2rem; font-weight: 800; color: #6366f1; letter-spacing: -0.02em; }
+    .doc-kp-footer { display: flex; justify-content: space-between; margin-top: 28px; padding-top: 16px; border-top: 1px solid #e5e5ef; font-size: 13px; color: #444; }
+
+    .cta-block {
+      margin-top: 40px; text-align: center;
+      background: linear-gradient(135deg, rgba(99,102,241,0.1), rgba(168,85,247,0.1));
+      border: 1px solid rgba(99,102,241,0.25); border-radius: var(--radius-lg);
+      padding: 36px 24px;
+    }
+    .cta-block h2 { font-size: 1.4rem; font-weight: 800; margin-bottom: 10px; }
+    .cta-block p { color: var(--text-muted); margin-bottom: 24px; }
+    .btn-primary {
+      display: inline-block; background: linear-gradient(135deg, var(--accent), #a855f7);
+      color: #fff; padding: 14px 32px; border-radius: 12px; font-weight: 700;
+      font-size: 0.95rem; text-decoration: none; border: none; cursor: pointer;
+      transition: opacity 0.2s, transform 0.1s;
+    }
+    .btn-primary:hover { opacity: 0.9; transform: translateY(-1px); }
+
+    @media (max-width: 600px) {
+      .doc-wrap { padding: 24px 20px; }
+      .doc-kp-header { margin: -24px -20px 24px; padding: 28px 20px; }
+      .doc-signatures { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container header-inner">
+      <a href="index.html" class="logo"><div class="logo-icon">Д</div>Документо</a>
+      <a href="index.html" class="back-link">← На главную</a>
+    </div>
+  </header>
+
+  <main>
+    <div class="container">
+      <div class="page-header">
+        <h1>Примеры документов</h1>
+        <p>Так выглядят готовые документы — заполненные, юридически корректные, готовые к подписанию</p>
+      </div>
+
+      <div class="tabs-row">
+        <button class="tab-btn is-active" onclick="showDoc('contract')">📄 Договор</button>
+        <button class="tab-btn" onclick="showDoc('act')">✅ Акт</button>
+        <button class="tab-btn" onclick="showDoc('kp')">💼 КП</button>
+      </div>
+
+      <!-- ДОГОВОР -->
+      <div class="doc-wrap is-active" id="ex-contract">
+        <div class="doc-header">
+          <h1>Договор оказания услуг</h1>
+          <div class="doc-num">№ 47</div>
+        </div>
+        <div class="doc-meta">г. Москва, 07 июня 2026 г.</div>
+        <div class="doc-parties">
+          <p><strong>Иванов Иван Иванович</strong>, ИНН 771234567890, являющийся плательщиком налога на профессиональный доход (самозанятый), именуемый далее «Исполнитель», с одной стороны, и</p>
+          <p><strong>ООО «Ромашка»</strong>, ИНН 7701234567, именуемый далее «Заказчик», с другой стороны,</p>
+          <p>совместно именуемые «Стороны», заключили настоящий Договор о нижеследующем:</p>
+        </div>
+        <div class="doc-section"><h2>1. Предмет договора</h2>
+          <p>1.1. Исполнитель обязуется оказать Заказчику следующие услуги: <strong>Разработка лендинга для сайта компании, включая адаптивную вёрстку, форму обратной связи и подключение Яндекс.Метрики</strong> (далее — «Услуги»), а Заказчик обязуется принять и оплатить Услуги.</p>
+          <p>1.2. Услуги оказываются дистанционно, если иное не согласовано Сторонами письменно.</p>
+        </div>
+        <div class="doc-section"><h2>2. Стоимость и порядок оплаты</h2>
+          <p>2.1. Стоимость Услуг составляет <strong>85 000 рублей</strong> (восемьдесят пять тысяч рублей 00 копеек). НДС не облагается (самозанятый, ФЗ № 422-ФЗ от 27.11.2018).</p>
+          <p>2.2. Оплата в два этапа: предоплата 50% (42 500 ₽) — в течение 3 рабочих дней с момента подписания Договора; остаток 50% (42 500 ₽) — в течение 3 рабочих дней после подписания Акта.</p>
+          <p>2.3. Исполнитель выдаёт чек через приложение «Мой налог» в день получения оплаты.</p>
+        </div>
+        <div class="doc-section"><h2>3. Сроки</h2>
+          <p>3.1. Исполнитель обязуется оказать Услуги в срок до <strong>30.06.2026</strong>.</p>
+          <p>3.2. Датой исполнения считается дата подписания Акта оказанных услуг.</p>
+        </div>
+        <div class="doc-section"><h2>4. Права и обязанности</h2>
+          <p>4.1. Исполнитель обязуется оказать Услуги качественно и в срок; информировать Заказчика о ходе работ по запросу.</p>
+          <p>4.2. Заказчик обязуется предоставить необходимые материалы; принять результат в течение 5 рабочих дней; произвести оплату в установленные сроки.</p>
+          <p>4.3. Если в течение 5 рабочих дней Заказчик не подписал Акт и не направил отказа — услуги считаются принятыми.</p>
+          <p>4.4. Исключительные права на результат переходят к Заказчику после получения полной оплаты.</p>
+        </div>
+        <div class="doc-section"><h2>5. Конфиденциальность</h2>
+          <p>Стороны обязуются не разглашать конфиденциальную информацию третьим лицам без письменного согласия другой Стороны в течение 2 лет после окончания Договора.</p>
+        </div>
+        <div class="doc-section"><h2>6. Ответственность</h2>
+          <p>6.1. За просрочку оплаты Заказчик уплачивает пеню 0,1% от суммы за каждый день просрочки.</p>
+          <p>6.2. За просрочку сдачи по вине Исполнителя — пеня 0,1% в день, но не более 10% от стоимости.</p>
+        </div>
+        <div class="doc-section"><h2>7. Заключительные положения</h2>
+          <p>7.1. Договор вступает в силу с момента подписания. Составлен в двух экземплярах. Скан с подписью имеет юридическую силу оригинала.</p>
+        </div>
+        <div class="doc-signatures">
+          <div class="doc-sig-block">
+            <p><strong>Исполнитель:</strong></p>
+            <p>Иванов Иван Иванович<br>ИНН: 771234567890<br>тел. +7 900 000-00-00</p>
+            <div class="doc-sig-line"></div>
+            <p>подпись / дата</p>
+          </div>
+          <div class="doc-sig-block">
+            <p><strong>Заказчик:</strong></p>
+            <p>ООО «Ромашка»<br>ИНН: 7701234567</p>
+            <div class="doc-sig-line"></div>
+            <p>подпись / дата</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- АКТ -->
+      <div class="doc-wrap" id="ex-act">
+        <div class="doc-header">
+          <h1>Акт оказанных услуг</h1>
+          <div class="doc-num">№ 12</div>
+        </div>
+        <div class="doc-meta">07 июля 2026 г.</div>
+        <div class="doc-parties">
+          <p><strong>Исполнитель:</strong> Иванов Иван Иванович, плательщик НПД (самозанятый)</p>
+          <p><strong>Заказчик:</strong> ООО «Ромашка»</p>
+          <p>Настоящий Акт составлен к Договору оказания услуг № 47 от 07 июня 2026 г.</p>
+        </div>
+        <div class="doc-section"><h2>1. Оказанные услуги</h2>
+          <p>Исполнитель оказал, а Заказчик принял следующие услуги:</p>
+          <p style="margin-top:8px;padding:12px;background:#f8f8fc;border-left:3px solid #6366f1;border-radius:0 6px 6px 0"><strong>Разработан лендинг для сайта компании: адаптивная вёрстка для всех устройств, форма обратной связи с отправкой на email, подключение Яндекс.Метрики и Google Analytics, оптимизация скорости загрузки.</strong></p>
+        </div>
+        <div class="doc-section"><h2>2. Стоимость и оплата</h2>
+          <p>2.1. Общая стоимость оказанных услуг составляет <strong>85 000 рублей</strong> (восемьдесят пять тысяч рублей). НДС не облагается (ФЗ № 422-ФЗ).</p>
+          <p>2.2. Услуги оказаны в полном объёме и в установленные сроки.</p>
+          <p>2.3. Заказчик претензий по объёму, качеству и срокам оказания услуг не имеет.</p>
+          <p>2.4. Ранее оплачено: 42 500 ₽. Остаток к оплате: <strong>42 500 ₽</strong>.</p>
+        </div>
+        <div class="doc-section"><h2>3. Приёмка</h2>
+          <p>3.1. Настоящий Акт является основанием для проведения окончательных расчётов.</p>
+          <p>3.2. Если в течение 5 рабочих дней Заказчик не подписал Акт и не направил отказа — услуги считаются принятыми, Акт подписанным в одностороннем порядке.</p>
+          <p>3.3. Акт составлен в двух экземплярах. Скан с подписью имеет юридическую силу оригинала.</p>
+        </div>
+        <div class="doc-signatures">
+          <div class="doc-sig-block"><p><strong>Исполнитель:</strong></p><p>Иванов Иван Иванович</p><div class="doc-sig-line"></div><p>подпись / дата</p></div>
+          <div class="doc-sig-block"><p><strong>Заказчик:</strong></p><p>ООО «Ромашка»</p><div class="doc-sig-line"></div><p>подпись / дата</p></div>
+        </div>
+      </div>
+
+      <!-- КП -->
+      <div class="doc-wrap" id="ex-kp">
+        <div class="doc-kp-header">
+          <h1>Коммерческое предложение</h1>
+          <p>Разработка лендинга под ключ</p>
+        </div>
+        <p>Уважаемый(ая) <strong>Алексей Петров</strong>,</p>
+        <p style="margin-top:10px">предлагаю Вашему вниманию коммерческое предложение по услуге <strong>«Разработка лендинга под ключ»</strong>.</p>
+        <div class="doc-section" style="margin-top:20px"><h2>Что входит в работу</h2>
+          <p>Создание современного одностраничного сайта: дизайн в Figma, адаптивная вёрстка (desktop/tablet/mobile), форма заявки с отправкой на email, подключение Яндекс.Метрики, базовое SEO, сдача с исходниками.</p>
+        </div>
+        <div class="doc-kp-price">
+          <div class="price-label">Стоимость</div>
+          <div class="price-value">85 000 ₽</div>
+          <div style="font-size:12px;color:#888;margin-top:4px">НДС не облагается — самозанятый, ФЗ № 422</div>
+        </div>
+        <div class="doc-section"><h2>Срок выполнения</h2><p><strong>14 рабочих дней</strong> с момента внесения предоплаты и согласования ТЗ.</p></div>
+        <div class="doc-section"><h2>Порядок работы</h2>
+          <p>1. Согласуем задачу и фиксируем требования в ТЗ.</p>
+          <p>2. Вы вносите предоплату — я приступаю к работе.</p>
+          <p>3. Сдаю результат, вносим правки до принятия.</p>
+          <p>4. Подписываем Акт оказанных услуг, финальный расчёт.</p>
+          <p>5. Выдаю чек через «Мой налог» — всё официально.</p>
+        </div>
+        <div class="doc-section"><h2>Гарантия и правки</h2>
+          <p>2 раунда правок включены в стоимость. Гарантийная поддержка 30 дней после сдачи.</p>
+        </div>
+        <div class="doc-section"><h2>Работаю официально</h2>
+          <p>Я самозанятый (плательщик НПД). Вы получаете <strong>договор, акт и чек</strong> — полный пакет закрывающих документов. Расходы можно включить в затраты компании.</p>
+        </div>
+        <div class="doc-section"><p><strong>Предложение действительно до: 30 июня 2026 г.</strong></p></div>
+        <p style="margin-top:20px">Готов приступить к работе после согласования деталей. Пишите — отвечу быстро.</p>
+        <div class="doc-kp-footer">
+          <div><strong>Иванов Иван Иванович</strong><br>Исполнитель, самозанятый<br>+7 900 000-00-00</div>
+          <div style="text-align:right">07 июня 2026 г.</div>
+        </div>
+      </div>
+
+      <div class="cta-block">
+        <h2>Создайте свой документ за 2 минуты</h2>
+        <p>Бесплатно · 3 документа в месяц · Без привязки карты</p>
+        <a href="index.html" class="btn-primary">Создать договор бесплатно →</a>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function showDoc(type) {
+      document.querySelectorAll('.doc-wrap').forEach(function(el) { el.classList.remove('is-active'); });
+      document.querySelectorAll('.tab-btn').forEach(function(el) { el.classList.remove('is-active'); });
+      document.getElementById('ex-' + type).classList.add('is-active');
+      event.target.classList.add('is-active');
+    }
+  </script>
+</body>
+</html>
