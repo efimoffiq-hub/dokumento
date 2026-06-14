@@ -1,0 +1,1045 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Создать документ — Документо</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0a0a0f; --surface: #13131a; --surface-2: #1c1c26;
+      --border: rgba(255,255,255,0.08); --text: #f4f4f5; --text-muted: #a1a1aa;
+      --accent: #6366f1; --accent-light: #818cf8; --accent-glow: rgba(99,102,241,0.35);
+      --green: #22c55e; --radius: 12px; --radius-lg: 20px;
+    }
+    [data-theme="light"] {
+      --bg: #f8f8fc; --surface: #ffffff; --surface-2: #f0f0f8;
+      --border: rgba(0,0,0,0.09); --text: #0f0f1a; --text-muted: #6b6b80;
+      --accent-light: #4f46e5; --accent-glow: rgba(99,102,241,0.2); --green: #16a34a;
+    }
+
+    body { font-family: 'Inter', system-ui, sans-serif; background: var(--bg); color: var(--text); -webkit-font-smoothing: antialiased; min-height: 100vh; }
+
+    /* Header */
+    header { position: fixed; top: 0; left: 0; right: 0; z-index: 100; background: rgba(10,10,15,0.85); backdrop-filter: blur(16px); border-bottom: 1px solid var(--border); }
+    [data-theme="light"] header { background: rgba(248,248,252,0.85); }
+    .header-inner { display: flex; align-items: center; justify-content: space-between; height: 64px; padding: 0 24px; max-width: 1200px; margin: 0 auto; }
+    .logo { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 1.1rem; text-decoration: none; color: var(--text); }
+    .logo-icon { width: 30px; height: 30px; background: linear-gradient(135deg, var(--accent), #a855f7); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; color: #fff; }
+    .header-right { display: flex; align-items: center; gap: 10px; }
+    .theme-toggle { width: 36px; height: 36px; border-radius: 8px; border: 1px solid var(--border); background: var(--surface-2); color: var(--text-muted); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1rem; transition: all 0.2s; }
+    .theme-toggle:hover { color: var(--text); border-color: rgba(99,102,241,0.4); }
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 9px 18px; border-radius: var(--radius); font-family: inherit; font-size: 0.88rem; font-weight: 600; cursor: pointer; border: none; transition: all 0.2s; text-decoration: none; }
+    .btn-ghost { background: transparent; border: 1px solid var(--border); color: var(--text-muted); }
+    .btn-ghost:hover { color: var(--text); border-color: rgba(255,255,255,0.2); }
+    .btn-primary { background: linear-gradient(135deg, var(--accent), #a855f7); color: #fff; }
+    .btn-primary:hover { opacity: 0.9; }
+    .hidden-block { display: none !important; }
+    .user-email { font-size: 0.82rem; color: var(--text-muted); max-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .plan-badge-header { display: inline-flex; align-items: center; gap: 5px; background: linear-gradient(135deg,rgba(99,102,241,0.2),rgba(168,85,247,0.2)); border: 1px solid rgba(99,102,241,0.4); border-radius: 999px; padding: 3px 10px; font-size: 0.75rem; font-weight: 700; color: var(--accent-light); cursor: pointer; transition: opacity 0.2s; }
+    .plan-badge-header:hover { opacity: 0.8; }
+
+    /* Layout */
+    .page-wrap { max-width: 1100px; margin: 0 auto; padding: 88px 24px 60px; display: grid; grid-template-columns: 420px 1fr; gap: 32px; align-items: start; }
+    @media (max-width: 900px) { .page-wrap { grid-template-columns: 1fr; } }
+
+    /* Left — form panel */
+    .form-panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 28px; position: sticky; top: 80px; }
+    .form-panel-title { font-size: 1.2rem; font-weight: 700; margin-bottom: 4px; }
+    .form-panel-sub { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 20px; }
+
+    /* Tabs */
+    .tabs { display: flex; gap: 6px; margin-bottom: 20px; background: var(--surface-2); padding: 4px; border-radius: 10px; }
+    .tab { flex: 1; padding: 9px 10px; border: none; border-radius: 8px; background: transparent; color: var(--text-muted); font-family: inherit; font-size: 0.82rem; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+    .tab:hover { color: var(--text); }
+    .tab.is-active { background: var(--accent); color: #fff; box-shadow: 0 2px 12px var(--accent-glow); }
+    .tab-panel { display: none; }
+    .tab-panel.is-active { display: block; }
+
+    /* Forms */
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .form-group { display: flex; flex-direction: column; gap: 5px; }
+    .form-group.full { grid-column: 1 / -1; }
+    .form-group label { font-size: 0.78rem; font-weight: 500; color: var(--text-muted); }
+    .form-group input, .form-group textarea { padding: 9px 12px; background: var(--surface-2); border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-family: inherit; font-size: 0.88rem; transition: border-color 0.2s; }
+    .form-group input:focus, .form-group textarea:focus { outline: none; border-color: var(--accent); }
+    .form-group textarea { resize: vertical; min-height: 72px; }
+    .form-group input::placeholder, .form-group textarea::placeholder { color: rgba(161,161,170,0.5); }
+    .form-section-label { grid-column: 1 / -1; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); padding-top: 8px; border-top: 1px solid var(--border); margin-top: 4px; }
+    .form-error { color: #f87171; font-size: 0.85rem; margin-top: 10px; min-height: 20px; display: none; }
+    .form-error.is-visible { display: block; }
+    .btn-generate { width: 100%; margin-top: 16px; padding: 13px; font-size: 0.95rem; }
+    .btn-generate:disabled { opacity: 0.6; cursor: not-allowed; }
+
+    /* Option toggles */
+    .opt-group { grid-column: 1 / -1; display: flex; flex-direction: column; gap: 7px; margin-top: 4px; }
+    .opt-toggle { display: flex; align-items: center; gap: 10px; padding: 9px 12px; background: var(--surface-2); border: 1px solid var(--border); border-radius: 10px; cursor: pointer; transition: border-color 0.2s, background 0.2s; user-select: none; }
+    .opt-toggle:hover { border-color: rgba(99,102,241,0.4); }
+    .opt-toggle.is-on { background: rgba(99,102,241,0.08); border-color: rgba(99,102,241,0.35); }
+    .opt-toggle-switch { width: 34px; height: 19px; background: var(--border); border-radius: 999px; position: relative; flex-shrink: 0; transition: background 0.2s; }
+    .opt-toggle.is-on .opt-toggle-switch { background: var(--accent); }
+    .opt-toggle-switch::after { content: ''; position: absolute; width: 13px; height: 13px; background: #fff; border-radius: 50%; top: 3px; left: 3px; transition: transform 0.2s; }
+    .opt-toggle.is-on .opt-toggle-switch::after { transform: translateX(15px); }
+    .opt-toggle-label { flex: 1; font-size: 0.83rem; font-weight: 500; color: var(--text); }
+    .opt-toggle-desc { font-size: 0.75rem; color: var(--text-muted); font-weight: 400; }
+    .opt-field { grid-column: 1 / -1; display: none; gap: 10px; }
+    .opt-field.is-visible { display: flex; flex-wrap: wrap; }
+    .opt-field .form-group { flex: 1; min-width: 130px; margin: 0; }
+    .amount-preview { grid-column: 1 / -1; display: none; background: rgba(99,102,241,0.07); border: 1px solid rgba(99,102,241,0.2); border-radius: 10px; padding: 10px 14px; font-size: 0.82rem; color: var(--text-muted); gap: 14px; flex-wrap: wrap; }
+    .amount-preview.is-visible { display: flex; }
+    .amount-preview-item strong { color: var(--text); font-size: 0.9rem; }
+
+    /* Right — result panel */
+    .result-panel { min-height: 400px; }
+    .result-placeholder { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 400px; background: var(--surface); border: 2px dashed var(--border); border-radius: var(--radius-lg); color: var(--text-muted); text-align: center; padding: 48px 24px; gap: 12px; }
+    .result-placeholder .ph-icon { font-size: 3rem; opacity: 0.4; }
+    .result-placeholder p { font-size: 0.9rem; max-width: 260px; line-height: 1.6; }
+    .result-content { display: none; }
+    .result-content.is-visible { display: block; }
+    .result-toolbar { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-bottom: 16px; }
+    .result-toolbar h2 { font-size: 1.1rem; font-weight: 700; }
+    .result-toolbar-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+    .btn-sm { padding: 7px 14px; font-size: 0.82rem; }
+
+    /* Document paper */
+    .document-paper { background: #fff; color: #1a1a1a; border-radius: var(--radius); padding: 48px 56px; box-shadow: 0 8px 40px rgba(0,0,0,0.25); font-size: 14px; line-height: 1.7; }
+    [data-theme="light"] .document-paper { box-shadow: 0 4px 24px rgba(0,0,0,0.08); }
+    .doc-header { text-align: center; margin-bottom: 28px; padding-bottom: 20px; border-bottom: 2px solid #6366f1; }
+    .doc-header h1 { font-size: 17px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; color: #1a1a1a; }
+    .doc-header .doc-num { font-size: 13px; color: #666; }
+    .doc-meta { text-align: right; margin-bottom: 24px; color: #444; font-size: 13px; }
+    .doc-section { margin-bottom: 18px; }
+    .doc-section h2 { font-size: 13px; font-weight: 700; margin-bottom: 8px; color: #1a1a1a; }
+    .doc-section p { text-align: justify; margin-bottom: 7px; color: #333; font-size: 13px; }
+    .doc-parties { margin-bottom: 24px; }
+    .doc-parties p { margin-bottom: 5px; color: #333; font-size: 13px; }
+    .doc-signatures { display: flex; justify-content: space-between; margin-top: 40px; gap: 32px; }
+    .doc-sig-block { flex: 1; }
+    .doc-sig-block p { margin-bottom: 4px; color: #333; font-size: 13px; }
+    .doc-sig-line { border-bottom: 1px solid #333; margin-top: 36px; margin-bottom: 4px; }
+    .doc-kp-header { background: linear-gradient(135deg,#6366f1,#8b5cf6); color: #fff; padding: 36px 56px; margin: -48px -56px 28px; border-radius: var(--radius) var(--radius) 0 0; }
+    .doc-kp-header h1 { font-size: 22px; font-weight: 800; margin-bottom: 6px; color: #fff; }
+    .doc-kp-header p { opacity: 0.85; font-size: 14px; color: #fff; }
+    .doc-kp-price { background: #f4f4f5; border-left: 4px solid #6366f1; padding: 18px 22px; margin: 20px 0; border-radius: 0 8px 8px 0; }
+    .doc-kp-price .price-label { font-size: 11px; color: #666; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; }
+    .doc-kp-price .price-value { font-size: 26px; font-weight: 800; color: #6366f1; }
+    .doc-kp-footer { margin-top: 28px; padding-top: 20px; border-top: 1px solid #e4e4e7; display: flex; justify-content: space-between; color: #666; font-size: 13px; }
+
+    /* Auth modal */
+    .modal-overlay { position: fixed; inset: 0; z-index: 200; background: rgba(0,0,0,0.7); backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; padding: 24px; opacity: 0; visibility: hidden; transition: opacity 0.25s, visibility 0.25s; }
+    .modal-overlay.is-open { opacity: 1; visibility: visible; }
+    .modal { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); width: 100%; max-width: 440px; max-height: 90vh; overflow-y: auto; padding: 32px; position: relative; transform: translateY(16px); transition: transform 0.25s; box-shadow: 0 24px 80px rgba(0,0,0,0.6); }
+    .modal-overlay.is-open .modal { transform: translateY(0); }
+    .modal-close { position: absolute; top: 16px; right: 16px; width: 34px; height: 34px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface-2); color: var(--text-muted); font-size: 1.1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+    .modal-title { font-size: 1.2rem; font-weight: 700; margin-bottom: 4px; padding-right: 40px; }
+    .modal-subtitle { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 20px; }
+    .auth-tabs { display: flex; gap: 6px; margin-bottom: 20px; background: var(--surface-2); padding: 4px; border-radius: 10px; }
+    .form-error-auth { color: #f87171; font-size: 0.85rem; margin-top: 8px; min-height: 20px; display: none; }
+    .form-error-auth.is-visible { display: block; }
+    .btn-lg { padding: 13px 24px; font-size: 0.95rem; }
+
+    /* Verify step */
+    .verify-step { display: none; flex-direction: column; gap: 14px; }
+    .verify-step.is-visible { display: flex; }
+    .verify-email-hint { font-size: 0.85rem; color: var(--text-muted); text-align: center; line-height: 1.5; }
+    .verify-email-hint strong { color: var(--text); }
+    .code-input-wrap { display: flex; gap: 8px; }
+    .code-input-wrap input { flex: 1; font-size: 1.4rem; font-weight: 700; letter-spacing: 0.2em; text-align: center; }
+    .verify-resend { background: none; border: none; color: var(--accent-light); font-size: 0.8rem; cursor: pointer; text-align: center; padding: 0; text-decoration: underline; text-underline-offset: 3px; }
+    .verify-resend:disabled { color: var(--text-muted); text-decoration: none; cursor: default; }
+
+    /* Pro modal */
+    .pro-modal-header { background: linear-gradient(135deg,var(--accent),#a855f7); margin: -32px -32px 24px; padding: 28px 32px; border-radius: var(--radius-lg) var(--radius-lg) 0 0; text-align: center; }
+    .pro-modal-header .pro-price { font-size: 2.4rem; font-weight: 800; color: #fff; letter-spacing: -0.03em; line-height: 1; margin-bottom: 4px; }
+    .pro-modal-header .pro-price span { font-size: 0.9rem; font-weight: 400; opacity: 0.8; }
+    .pro-modal-header p { color: rgba(255,255,255,0.85); font-size: 0.88rem; margin-top: 6px; }
+    .pro-features-list { list-style: none; margin-bottom: 20px; display: flex; flex-direction: column; gap: 10px; }
+    .pro-features-list li { display: flex; align-items: flex-start; gap: 10px; font-size: 0.88rem; line-height: 1.5; }
+    .pro-features-list li .pf-icon { flex-shrink: 0; width: 20px; height: 20px; background: rgba(99,102,241,0.15); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; }
+    .pro-divider { border: none; border-top: 1px solid var(--border); margin: 16px 0; }
+    .btn-pay { background: linear-gradient(135deg,var(--accent),#a855f7); color: #fff; box-shadow: 0 4px 24px rgba(99,102,241,0.4); }
+    .btn-pay:hover { opacity: 0.9; }
+    .btn-pay:disabled { opacity: 0.6; cursor: not-allowed; }
+    .pay-note { text-align: center; font-size: 0.78rem; color: var(--text-muted); margin-top: 10px; }
+
+    /* Expiry banner */
+    .expiry-banner { display: none; position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 300; background: var(--surface); border: 1px solid rgba(239,68,68,0.4); border-radius: 12px; padding: 12px 18px; font-size: 0.85rem; color: #fca5a5; box-shadow: 0 8px 32px rgba(0,0,0,0.4); white-space: nowrap; align-items: center; gap: 10px; }
+    .expiry-banner.is-hidden { display: none !important; }
+    .expiry-banner { display: flex; }
+    .expiry-banner button { background: rgba(239,68,68,0.15); border: 1px solid rgba(239,68,68,0.3); border-radius: 8px; color: #fca5a5; font-size: 0.78rem; font-weight: 600; padding: 3px 10px; cursor: pointer; }
+
+    @media (max-width: 600px) {
+      .page-wrap { padding: 80px 16px 40px; }
+      .document-paper { padding: 28px 20px; }
+      .doc-kp-header { margin: -28px -20px 24px; padding: 28px 20px; }
+      .doc-signatures { flex-direction: column; gap: 24px; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-inner">
+      <a href="index.html" class="logo"><div class="logo-icon">Д</div>Документо</a>
+      <div class="header-right">
+        <button type="button" class="theme-toggle" id="theme-toggle" title="Сменить тему">🌙</button>
+        <button type="button" class="btn btn-ghost js-open-auth" id="header-btn-login">Войти</button>
+        <span class="user-email hidden-block" id="user-email"></span>
+        <span class="plan-badge-header hidden-block" id="plan-badge-header" title="Улучшить план">⚡ Pro</span>
+        <button type="button" class="btn btn-ghost hidden-block" id="btn-logout">Выйти</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="page-wrap">
+    <!-- LEFT: Form -->
+    <div class="form-panel">
+      <h1 class="form-panel-title">Создать документ</h1>
+      <p class="form-panel-sub">Заполните форму — документ готов мгновенно</p>
+
+      <div class="tabs generator-tabs" role="tablist">
+        <button type="button" class="tab is-active" data-tab="contract" role="tab">Договор</button>
+        <button type="button" class="tab" data-tab="act" role="tab">Акт</button>
+        <button type="button" class="tab" data-tab="kp" role="tab">КП</button>
+      </div>
+
+      <!-- Договор -->
+      <div class="tab-panel is-active" id="panel-contract">
+        <form id="form-contract">
+          <div class="form-grid">
+            <div class="form-section-label">Исполнитель</div>
+            <div class="form-group">
+              <label for="c-executor">ФИО <span style="color:var(--accent-light);font-size:0.72rem;display:none" id="req-hint">· сохранено</span></label>
+              <input type="text" id="c-executor" name="executor" placeholder="Иванов Иван Иванович" required>
+            </div>
+            <div class="form-group">
+              <label for="c-executor-inn">ИНН</label>
+              <input type="text" id="c-executor-inn" name="executorInn" placeholder="123456789012" maxlength="12">
+            </div>
+            <div class="form-group">
+              <label for="c-city">Город заключения</label>
+              <input type="text" id="c-city" name="city" placeholder="Москва" required>
+            </div>
+            <div class="form-group">
+              <label for="c-executor-contact">Телефон / email</label>
+              <input type="text" id="c-executor-contact" name="executorContact" placeholder="+7 900 000-00-00">
+            </div>
+            <div class="form-section-label">Заказчик</div>
+            <div class="form-group">
+              <label for="c-client">ФИО / название</label>
+              <input type="text" id="c-client" name="client" placeholder="ООО «Ромашка»" required>
+            </div>
+            <div class="form-group">
+              <label for="c-client-inn">ИНН заказчика</label>
+              <input type="text" id="c-client-inn" name="clientInn" placeholder="7701234567">
+            </div>
+            <div class="form-section-label">Услуга и оплата</div>
+            <div class="form-group full">
+              <label for="c-service">Описание услуги</label>
+              <textarea id="c-service" name="service" placeholder="Разработка лендинга для сайта компании" required></textarea>
+            </div>
+            <div class="form-group">
+              <label for="c-amount">Сумма, ₽</label>
+              <input type="number" id="c-amount" name="amount" placeholder="85000" min="1" required>
+            </div>
+            <div class="form-group">
+              <label for="c-deadline">Срок выполнения</label>
+              <input type="text" id="c-deadline" name="deadline" placeholder="30.06.2026" required>
+            </div>
+            <div class="amount-preview" id="c-amount-preview">
+              <div class="amount-preview-item">Предоплата: <strong id="c-preview-prepay">—</strong></div>
+              <div class="amount-preview-item">Остаток: <strong id="c-preview-rest">—</strong></div>
+            </div>
+            <div class="form-section-label">Опции</div>
+            <div class="opt-group">
+              <label class="opt-toggle is-on" id="opt-c-prepay" data-opt="c-prepay">
+                <div class="opt-toggle-switch"></div>
+                <div class="opt-toggle-label">Предоплата<div class="opt-toggle-desc">Разбить оплату на два этапа</div></div>
+              </label>
+              <div class="opt-field is-visible" id="field-c-prepay">
+                <div class="form-group"><label for="c-prepay-pct">Предоплата, %</label><input type="number" id="c-prepay-pct" name="prepay" placeholder="50" min="1" max="99" value="50"></div>
+              </div>
+              <label class="opt-toggle is-on" id="opt-c-penalty" data-opt="c-penalty">
+                <div class="opt-toggle-switch"></div>
+                <div class="opt-toggle-label">Пеня за просрочку<div class="opt-toggle-desc">0,1% в день за просрочку</div></div>
+              </label>
+              <label class="opt-toggle is-on" id="opt-c-nda" data-opt="c-nda">
+                <div class="opt-toggle-switch"></div>
+                <div class="opt-toggle-label">Конфиденциальность (NDA)<div class="opt-toggle-desc">Не разглашать данные проекта</div></div>
+              </label>
+              <label class="opt-toggle is-on" id="opt-c-portfolio" data-opt="c-portfolio">
+                <div class="opt-toggle-switch"></div>
+                <div class="opt-toggle-label">Право на портфолио<div class="opt-toggle-desc">Упомянуть проект в портфолио</div></div>
+              </label>
+              <label class="opt-toggle is-on" id="opt-c-ip" data-opt="c-ip">
+                <div class="opt-toggle-switch"></div>
+                <div class="opt-toggle-label">Передача прав на результат<div class="opt-toggle-desc">После полной оплаты</div></div>
+              </label>
+              <label class="opt-toggle" id="opt-c-remote" data-opt="c-remote">
+                <div class="opt-toggle-switch"></div>
+                <div class="opt-toggle-label">Реквизиты банка<div class="opt-toggle-desc">Добавить счёт для оплаты</div></div>
+              </label>
+              <div class="opt-field" id="field-c-remote">
+                <div class="form-group"><label for="c-bank">Банк</label><input type="text" id="c-bank" name="bank" placeholder="Сбербанк"></div>
+                <div class="form-group"><label for="c-account">Счёт / карта</label><input type="text" id="c-account" name="account" placeholder="4276 **** **** 1234"></div>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <!-- Акт -->
+      <div class="tab-panel" id="panel-act">
+        <form id="form-act">
+          <div class="form-grid">
+            <div class="form-section-label">Стороны</div>
+            <div class="form-group">
+              <label for="a-executor">ФИО исполнителя</label>
+              <input type="text" id="a-executor" name="executor" placeholder="Иванов Иван Иванович" required>
+            </div>
+            <div class="form-group">
+              <label for="a-client">Заказчик</label>
+              <input type="text" id="a-client" name="client" placeholder="ООО «Ромашка»" required>
+            </div>
+            <div class="form-section-label">Работы и оплата</div>
+            <div class="form-group full">
+              <label for="a-work">Что сделано</label>
+              <textarea id="a-work" name="work" placeholder="Разработан лендинг, свёрстан адаптивный макет" required></textarea>
+            </div>
+            <div class="form-group">
+              <label for="a-amount">Сумма, ₽</label>
+              <input type="number" id="a-amount" name="amount" placeholder="85000" min="1" required>
+            </div>
+            <div class="form-group">
+              <label for="a-date">Дата акта</label>
+              <input type="date" id="a-date" name="date" required>
+            </div>
+            <div class="form-section-label">Опции</div>
+            <div class="opt-group">
+              <label class="opt-toggle is-on" id="opt-a-contract" data-opt="a-contract">
+                <div class="opt-toggle-switch"></div>
+                <div class="opt-toggle-label">Ссылка на договор<div class="opt-toggle-desc">Указать № и дату договора</div></div>
+              </label>
+              <div class="opt-field is-visible" id="field-a-contract">
+                <div class="form-group"><label for="a-contract-num">№ договора</label><input type="text" id="a-contract-num" name="contractNum" placeholder="47"></div>
+                <div class="form-group"><label for="a-contract-date">Дата договора</label><input type="text" id="a-contract-date" name="contractDate" placeholder="01.06.2026"></div>
+              </div>
+              <label class="opt-toggle is-on" id="opt-a-nopretension" data-opt="a-nopretension">
+                <div class="opt-toggle-switch"></div>
+                <div class="opt-toggle-label">«Претензий не имею»<div class="opt-toggle-desc">Заказчик подтверждает принятие</div></div>
+              </label>
+              <label class="opt-toggle is-on" id="opt-a-auto-accept" data-opt="a-auto-accept">
+                <div class="opt-toggle-switch"></div>
+                <div class="opt-toggle-label">Автоматическая приёмка<div class="opt-toggle-desc">Через 5 дней без ответа</div></div>
+              </label>
+              <label class="opt-toggle" id="opt-a-partial" data-opt="a-partial">
+                <div class="opt-toggle-switch"></div>
+                <div class="opt-toggle-label">Частичная оплата<div class="opt-toggle-desc">Сколько уже оплачено</div></div>
+              </label>
+              <div class="opt-field" id="field-a-partial">
+                <div class="form-group"><label for="a-paid">Уже оплачено, ₽</label><input type="number" id="a-paid" name="paid" placeholder="42500" min="0"></div>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <!-- КП -->
+      <div class="tab-panel" id="panel-kp">
+        <form id="form-kp">
+          <div class="form-grid">
+            <div class="form-section-label">Стороны</div>
+            <div class="form-group">
+              <label for="k-executor">Ваше имя</label>
+              <input type="text" id="k-executor" name="executor" placeholder="Иван Иванов" required>
+            </div>
+            <div class="form-group">
+              <label for="k-client">Клиент</label>
+              <input type="text" id="k-client" name="client" placeholder="Алексей Петров" required>
+            </div>
+            <div class="form-group">
+              <label for="k-contact">Ваш контакт</label>
+              <input type="text" id="k-contact" name="contact" placeholder="+7 900 000-00-00">
+            </div>
+            <div class="form-section-label">Услуга</div>
+            <div class="form-group full">
+              <label for="k-title">Название услуги</label>
+              <input type="text" id="k-title" name="title" placeholder="Разработка лендинга" required>
+            </div>
+            <div class="form-group full">
+              <label for="k-desc">Что входит в работу</label>
+              <textarea id="k-desc" name="description" placeholder="Адаптивная вёрстка, форма обратной связи, аналитика" required></textarea>
+            </div>
+            <div class="form-group">
+              <label for="k-amount">Стоимость, ₽</label>
+              <input type="number" id="k-amount" name="amount" placeholder="85000" min="1" required>
+            </div>
+            <div class="form-group">
+              <label for="k-term">Срок</label>
+              <input type="text" id="k-term" name="term" placeholder="14 рабочих дней" required>
+            </div>
+            <div class="form-section-label">Опции</div>
+            <div class="opt-group">
+              <label class="opt-toggle is-on" id="opt-k-valid" data-opt="k-valid">
+                <div class="opt-toggle-switch"></div>
+                <div class="opt-toggle-label">Срок действия КП<div class="opt-toggle-desc">До какой даты актуально</div></div>
+              </label>
+              <div class="opt-field is-visible" id="field-k-valid">
+                <div class="form-group"><label for="k-valid">Действует до</label><input type="text" id="k-valid" name="valid" placeholder="30.06.2026"></div>
+              </div>
+              <label class="opt-toggle is-on" id="opt-k-process" data-opt="k-process">
+                <div class="opt-toggle-switch"></div>
+                <div class="opt-toggle-label">Этапы работы<div class="opt-toggle-desc">ТЗ → предоплата → сдача → акт</div></div>
+              </label>
+              <label class="opt-toggle is-on" id="opt-k-legal" data-opt="k-legal">
+                <div class="opt-toggle-switch"></div>
+                <div class="opt-toggle-label">«Работаю официально»<div class="opt-toggle-desc">Самозанятость, чек, закрывающие документы</div></div>
+              </label>
+              <label class="opt-toggle" id="opt-k-guarantee" data-opt="k-guarantee">
+                <div class="opt-toggle-switch"></div>
+                <div class="opt-toggle-label">Гарантия / правки<div class="opt-toggle-desc">Описание гарантии</div></div>
+              </label>
+              <div class="opt-field" id="field-k-guarantee">
+                <div class="form-group"><label for="k-guarantee">Гарантия</label><input type="text" id="k-guarantee" name="guarantee" placeholder="2 раунда правок, 30 дней поддержки"></div>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <div class="form-error" id="generator-error"></div>
+      <button type="button" class="btn btn-primary btn-generate" id="btn-generate">Сгенерировать документ →</button>
+    </div>
+
+    <!-- RIGHT: Result -->
+    <div class="result-panel">
+      <div class="result-placeholder" id="result-placeholder">
+        <div class="ph-icon">📄</div>
+        <p>Заполните форму слева и нажмите «Сгенерировать» — документ появится здесь</p>
+      </div>
+
+      <div class="result-content" id="result-content">
+        <div class="result-toolbar">
+          <h2 id="result-title">Договор готов</h2>
+          <div class="result-toolbar-actions">
+            <button type="button" class="btn btn-ghost btn-sm" id="btn-edit">← Изменить</button>
+            <button type="button" class="btn btn-ghost btn-sm" id="btn-create-act" style="display:none">Создать акт</button>
+            <button type="button" class="btn btn-primary btn-sm" id="btn-download">Скачать PDF</button>
+          </div>
+        </div>
+        <div class="document-paper">
+          <div id="generated-document"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Auth modal -->
+  <div class="modal-overlay" id="auth-modal" aria-hidden="true">
+    <div class="modal">
+      <button type="button" class="modal-close" id="auth-modal-close">&times;</button>
+      <h2 class="modal-title">Войти в Документо</h2>
+      <p class="modal-subtitle">Нужен аккаунт для генерации документов</p>
+      <div class="auth-tabs tabs" role="tablist">
+        <button type="button" class="tab is-active" data-auth-tab="login">Войти</button>
+        <button type="button" class="tab" data-auth-tab="register">Регистрация</button>
+      </div>
+      <div class="tab-panel is-active" id="panel-auth-login">
+        <form id="form-login">
+          <div class="form-grid">
+            <div class="form-group full"><label for="login-email">Email</label><input type="email" id="login-email" name="email" placeholder="you@example.com" required></div>
+            <div class="form-group full"><label for="login-password">Пароль</label><input type="password" id="login-password" name="password" placeholder="Ваш пароль" required></div>
+          </div>
+        </form>
+      </div>
+      <div class="tab-panel" id="panel-auth-register">
+        <form id="form-register">
+          <div class="form-grid" id="register-fields">
+            <div class="form-group full"><label for="register-email">Email</label><input type="email" id="register-email" name="email" placeholder="you@example.com" required></div>
+            <div class="form-group full"><label for="register-password">Пароль</label><input type="password" id="register-password" name="password" placeholder="Минимум 6 символов" minlength="6" required></div>
+          </div>
+        </form>
+        <div class="verify-step" id="verify-step">
+          <p class="verify-email-hint">Отправили код на <strong id="verify-email-shown"></strong></p>
+          <div class="code-input-wrap"><input type="text" id="verify-code" placeholder="000000" maxlength="6" inputmode="numeric" autocomplete="one-time-code"></div>
+          <button type="button" class="verify-resend" id="btn-resend" disabled>Отправить повторно (<span id="resend-timer">60</span>с)</button>
+        </div>
+      </div>
+      <div class="form-error-auth" id="auth-error"></div>
+      <button type="button" class="btn btn-primary btn-lg" id="btn-auth-submit" style="width:100%;margin-top:16px">Войти</button>
+    </div>
+  </div>
+
+  <!-- Pro modal -->
+  <div class="modal-overlay" id="pro-modal" aria-hidden="true">
+    <div class="modal" style="max-width:460px">
+      <button type="button" class="modal-close" id="pro-modal-close">&times;</button>
+      <div class="pro-modal-header">
+        <div style="font-size:1.8rem;margin-bottom:6px">⚡</div>
+        <div class="pro-price">499 ₽<span>/месяц</span></div>
+        <p>Безлимитные документы без ограничений</p>
+      </div>
+      <ul class="pro-features-list">
+        <li><span class="pf-icon">📄</span><span><strong>Безлимит</strong> — договоры, акты, КП без ограничений</span></li>
+        <li><span class="pf-icon">⚡</span><span><strong>Приоритетная поддержка</strong> — ответ за 24 часа</span></li>
+        <li><span class="pf-icon">🆕</span><span><strong>Новые документы</strong> — первыми получаете обновления</span></li>
+      </ul>
+      <hr class="pro-divider">
+      <div id="pro-modal-current-plan" style="display:none;margin-bottom:14px;padding:10px 14px;background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.2);border-radius:10px;font-size:0.85rem;color:#86efac;text-align:center"></div>
+      <button type="button" class="btn btn-pay btn-lg" id="btn-pay" style="width:100%">Перейти к оплате — 499 ₽</button>
+      <p class="pay-note">Оплата через ЮKassa · Карта, СБП, кошелёк</p>
+    </div>
+  </div>
+
+  <!-- Expiry banner -->
+  <div class="expiry-banner is-hidden" id="expiry-banner">
+    <span id="expiry-banner-text">⚠️ Подписка Pro истекает через 3 дня</span>
+    <button type="button" id="expiry-banner-btn">Продлить</button>
+    <button type="button" onclick="document.getElementById('expiry-banner').classList.add('is-hidden')" style="background:transparent;border:none;color:var(--text-muted);font-size:1rem;cursor:pointer;padding:0 4px">×</button>
+  </div>
+
+  <script>
+  (function() {
+    const API = 'https://dokumento-production.up.railway.app';
+    const TOKEN_KEY = 'dokumento_token';
+
+    // === THEME ===
+    (function() {
+      var btn = document.getElementById('theme-toggle');
+      function applyTheme(t) {
+        document.documentElement.setAttribute('data-theme', t);
+        btn.textContent = t === 'light' ? '🌙' : '☀️';
+      }
+      applyTheme(localStorage.getItem('dokumento_theme') || 'dark');
+      btn.addEventListener('click', function() {
+        var next = document.documentElement.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+        localStorage.setItem('dokumento_theme', next);
+        applyTheme(next);
+      });
+    })();
+
+    // === STATE ===
+    var activeTab = 'contract';
+    var lastGeneratedTab = 'contract';
+    var activeAuthTab = 'login';
+    var currentUser = null;
+    var lastContractData = null;
+    var registerStep = 1;
+    var registerEmail = '';
+    var resendInterval = null;
+
+    var today = new Date();
+    var dateStr = formatDateRu(today);
+    document.getElementById('a-date').valueAsDate = today;
+
+    // === HELPERS ===
+    function getToken() { return localStorage.getItem(TOKEN_KEY); }
+    function setToken(t) { localStorage.setItem(TOKEN_KEY, t); }
+    function clearToken() { localStorage.removeItem(TOKEN_KEY); }
+
+    async function apiFetch(path, opts) {
+      opts = opts || {};
+      var headers = { 'Content-Type': 'application/json' };
+      if (opts.auth !== false && getToken()) headers['Authorization'] = 'Bearer ' + getToken();
+      var res = await fetch(API + path, { method: opts.method || 'GET', headers: headers, body: opts.body });
+      var data = await res.json().catch(function() { return {}; });
+      return { res: res, data: data };
+    }
+
+    function formatDateRu(d) {
+      var m = ['января','февраля','марта','апреля','мая','июня','июля','августа','сентября','октября','ноября','декабря'];
+      return '«' + String(d.getDate()).padStart(2,'0') + '» ' + m[d.getMonth()] + ' ' + d.getFullYear() + ' г.';
+    }
+
+    function formatMoney(n) { return Number(n).toLocaleString('ru-RU') + ' ₽'; }
+
+    function amountWords(num) {
+      var n = Math.floor(Number(num));
+      if (isNaN(n)) return '';
+      var ones=['','один','два','три','четыре','пять','шесть','семь','восемь','девять'];
+      var teens=['десять','одиннадцать','двенадцать','тринадцать','четырнадцать','пятнадцать','шестнадцать','семнадцать','восемнадцать','девятнадцать'];
+      var tens=['','','двадцать','тридцать','сорок','пятьдесят','шестьдесят','семьдесят','восемьдесят','девяносто'];
+      var hundreds=['','сто','двести','триста','четыреста','пятьсот','шестьсот','семьсот','восемьсот','девятьсот'];
+      function triplet(x,fem){var h=Math.floor(x/100),t=Math.floor((x%100)/10),o=x%10,r=hundreds[h];if(t===1){r+=(r?' ':'')+teens[o];}else{if(t)r+=(r?' ':'')+tens[t];if(o){if(fem&&o<=2)r+=(r?' ':'')+( o===1?'одна':'две');else r+=(r?' ':'')+ones[o];}}return r;}
+      function rF(x){var m=x%100,o=x%10;if(m>=11&&m<=19)return'рублей';if(o===1)return'рубль';if(o>=2&&o<=4)return'рубля';return'рублей';}
+      if(n===0)return'ноль рублей';
+      var parts=[],mil=Math.floor(n/1e6),tho=Math.floor((n%1e6)/1000),rest=n%1000;
+      if(mil)parts.push(triplet(mil,false)+' миллион'+(mil%10===1&&mil%100!==11?'':(mil%10>=2&&mil%10<=4&&(mil%100<10||mil%100>=20)?'а':'ов')));
+      if(tho)parts.push(triplet(tho,true)+' тысяч'+(tho%10===1&&tho%100!==11?'а':((tho%10>=2&&tho%10<=4&&(tho%100<10||tho%100>=20))?'и':'')));
+      if(rest)parts.push(triplet(rest,false));
+      return parts.join(' ')+' '+rF(n);
+    }
+
+    var REQ_KEY = 'dokumento_req';
+    var docCounterKey = 'dokumento_doc_num';
+
+    function docNum() {
+      var n = parseInt(localStorage.getItem(docCounterKey)||'0',10)+1;
+      localStorage.setItem(docCounterKey,String(n));
+      return String(n);
+    }
+
+    function esc(str) { var d=document.createElement('div'); d.textContent=str; return d.innerHTML; }
+
+    function saveRequisites(executor,city,inn,contact) {
+      if(executor) localStorage.setItem(REQ_KEY, JSON.stringify({executor:executor,city:city||'',inn:inn||'',contact:contact||''}));
+    }
+    function loadRequisites() { try{return JSON.parse(localStorage.getItem(REQ_KEY))||{};}catch(e){return{};} }
+    function fillRequisites() {
+      var req=loadRequisites();
+      if(!req.executor)return;
+      ['c-executor','a-executor','k-executor'].forEach(function(id){var el=document.getElementById(id);if(el&&!el.value)el.value=req.executor;});
+      var c=document.getElementById('c-city'); if(c&&!c.value&&req.city)c.value=req.city;
+      var inn=document.getElementById('c-executor-inn'); if(inn&&!inn.value&&req.inn)inn.value=req.inn;
+      var con=document.getElementById('c-executor-contact'); if(con&&!con.value&&req.contact)con.value=req.contact;
+      var kc=document.getElementById('k-contact'); if(kc&&!kc.value&&req.contact)kc.value=req.contact;
+      var hint=document.getElementById('req-hint'); if(hint)hint.style.display='inline';
+    }
+    fillRequisites();
+
+    // === OPTION TOGGLES ===
+    document.querySelectorAll('.opt-toggle').forEach(function(toggle) {
+      toggle.addEventListener('click', function() {
+        var isOn = toggle.classList.toggle('is-on');
+        var field = document.getElementById('field-' + toggle.dataset.opt);
+        if (field) {
+          if (isOn) field.classList.add('is-visible');
+          else field.classList.remove('is-visible');
+          field.querySelectorAll('input,textarea').forEach(function(el){ el.disabled = !isOn; });
+        }
+        setTimeout(updateAmountPreview, 50);
+      });
+      var field = document.getElementById('field-' + toggle.dataset.opt);
+      if (field && !toggle.classList.contains('is-on')) {
+        field.querySelectorAll('input,textarea').forEach(function(el){ el.disabled=true; });
+      }
+    });
+
+    function updateAmountPreview() {
+      var amountEl=document.getElementById('c-amount');
+      var prepayEl=document.getElementById('c-prepay-pct');
+      var preview=document.getElementById('c-amount-preview');
+      var tog=document.getElementById('opt-c-prepay');
+      if(!amountEl||!prepayEl||!preview)return;
+      var amount=parseFloat(amountEl.value),pct=parseInt(prepayEl.value,10);
+      if(amount>0&&pct>0&&pct<100&&tog&&tog.classList.contains('is-on')){
+        document.getElementById('c-preview-prepay').textContent=formatMoney(Math.round(amount*pct/100));
+        document.getElementById('c-preview-rest').textContent=formatMoney(Math.round(amount*(100-pct)/100));
+        preview.classList.add('is-visible');
+      } else { preview.classList.remove('is-visible'); }
+    }
+    document.getElementById('c-amount').addEventListener('input', updateAmountPreview);
+    document.getElementById('c-prepay-pct').addEventListener('input', updateAmountPreview);
+
+    // === TABS (generator) ===
+    var generatorTabs = document.querySelectorAll('.generator-tabs .tab');
+    generatorTabs.forEach(function(tab) {
+      tab.addEventListener('click', function() { switchGeneratorTab(tab.dataset.tab); });
+    });
+
+    function switchGeneratorTab(name) {
+      activeTab = name;
+      generatorTabs.forEach(function(t){ t.classList.toggle('is-active', t.dataset.tab===name); });
+      document.querySelectorAll('.generator-tabs ~ .tab-panel').forEach(function(p){
+        p.classList.toggle('is-active', p.id==='panel-'+name);
+      });
+    }
+
+    // === GENERATE ===
+    document.getElementById('btn-generate').addEventListener('click', generate);
+
+    function showGeneratorError(msg) { var e=document.getElementById('generator-error'); e.textContent=msg; e.classList.add('is-visible'); }
+    function hideGeneratorError() { var e=document.getElementById('generator-error'); e.textContent=''; e.classList.remove('is-visible'); }
+
+    async function generate() {
+      var form = document.getElementById('form-' + activeTab);
+      if (!form.reportValidity()) return;
+
+      var btn = document.getElementById('btn-generate');
+      btn.disabled = true;
+      hideGeneratorError();
+
+      // Сохраняем реквизиты
+      var data = Object.fromEntries(new FormData(form));
+      if (activeTab === 'contract') {
+        lastContractData = data;
+        saveRequisites(data.executor, data.city, data.executorInn, data.executorContact);
+      } else if (data.executor) {
+        saveRequisites(data.executor, '', '', data.contact || '');
+      }
+
+      try {
+        var result = await apiFetch('/api/documents/count', { method: 'POST' });
+
+        if (result.res.status === 403) {
+          showGeneratorError('Лимит исчерпан — 3 документа в месяц на бесплатном плане');
+          setTimeout(function() { openProModal(); }, 1200);
+          btn.disabled = false;
+          return;
+        }
+        if (!result.res.ok) {
+          if (result.res.status === 401) {
+            showGeneratorError('Войдите в аккаунт для генерации документов');
+            openAuthModal();
+            btn.disabled = false;
+            return;
+          }
+          showGeneratorError(result.data.error || 'Ошибка сервера');
+          btn.disabled = false;
+          return;
+        }
+
+        if (currentUser) { currentUser.documentsUsed = result.data.used; currentUser.documentsRemaining = result.data.remaining; }
+
+        var html;
+        if (activeTab === 'contract') html = buildContract(data);
+        else if (activeTab === 'act') html = buildAct(data);
+        else html = buildKp(data);
+
+        lastGeneratedTab = activeTab;
+        document.getElementById('generated-document').innerHTML = html;
+        document.getElementById('result-placeholder').style.display = 'none';
+        document.getElementById('result-content').classList.add('is-visible');
+
+        var titles = { contract: 'Договор готов ✓', act: 'Акт готов ✓', kp: 'КП готово ✓' };
+        document.getElementById('result-title').textContent = titles[activeTab] || 'Документ готов ✓';
+
+        // Кнопка создать акт
+        document.getElementById('btn-create-act').style.display = activeTab === 'contract' ? 'inline-flex' : 'none';
+
+        // Скролл к результату на мобильном
+        if (window.innerWidth < 900) {
+          document.getElementById('result-content').scrollIntoView({ behavior: 'smooth' });
+        }
+      } catch(e) {
+        showGeneratorError('Не удалось связаться с сервером');
+      } finally {
+        btn.disabled = false;
+      }
+    }
+
+    document.getElementById('btn-edit').addEventListener('click', function() {
+      document.getElementById('result-content').classList.remove('is-visible');
+      document.getElementById('result-placeholder').style.display = '';
+      if (window.innerWidth < 900) window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+
+    document.getElementById('btn-create-act').addEventListener('click', function() {
+      if (!lastContractData) return;
+      var aExec=document.getElementById('a-executor'); if(aExec)aExec.value=lastContractData.executor||'';
+      var aClient=document.getElementById('a-client'); if(aClient)aClient.value=lastContractData.client||'';
+      var aWork=document.getElementById('a-work'); if(aWork)aWork.value=lastContractData.service||'';
+      var aAmount=document.getElementById('a-amount'); if(aAmount)aAmount.value=lastContractData.amount||'';
+      switchGeneratorTab('act');
+      document.getElementById('result-content').classList.remove('is-visible');
+      document.getElementById('result-placeholder').style.display = '';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+
+    document.getElementById('btn-download').addEventListener('click', function() {
+      var el = document.getElementById('generated-document');
+      if (!el || !el.innerHTML.trim()) return;
+      var names = { contract: 'договор.pdf', act: 'акт.pdf', kp: 'кп.pdf' };
+      var w = window.open('', '_blank');
+      if (!w) return;
+      w.document.write('<!DOCTYPE html><html><head><meta charset="UTF-8"><title>'+(names[lastGeneratedTab]||'документ.pdf')+'</title><style>'
+        +'body{font-family:Arial,sans-serif;padding:40px;color:#000;font-size:14px;line-height:1.8}'
+        +'.doc-header{text-align:center;margin-bottom:32px;padding-bottom:24px;border-bottom:2px solid #6366f1}'
+        +'.doc-header h1{font-size:18px;font-weight:700;text-transform:uppercase}'
+        +'.doc-meta{text-align:right;margin-bottom:28px}'
+        +'.doc-section{margin-bottom:20px}.doc-section h2{font-size:14px;font-weight:700;margin-bottom:10px}'
+        +'.doc-section p,.doc-parties p{text-align:justify;margin-bottom:8px}'
+        +'.doc-signatures{display:flex;justify-content:space-between;margin-top:48px;gap:40px}'
+        +'.doc-sig-line{border-bottom:1px solid #333;margin-top:40px;margin-bottom:4px}'
+        +'.doc-kp-header{background:#6366f1;color:#fff;padding:32px;margin:-40px -40px 32px}'
+        +'.doc-kp-header h1,.doc-kp-header p{color:#fff}'
+        +'.doc-kp-price{background:#f4f4f5;border-left:4px solid #6366f1;padding:20px 24px;margin:24px 0}'
+        +'.doc-kp-price .price-value{font-size:28px;font-weight:800;color:#6366f1}'
+        +'@media print{body{padding:20px}}'
+        +'</style></head><body>'+el.innerHTML+'</body></html>');
+      w.document.close();
+      setTimeout(function(){ w.print(); }, 400);
+    });
+
+    // === BUILD FUNCTIONS ===
+    function buildContract(d) {
+      var num=docNum(),amount=formatMoney(d.amount),words=amountWords(d.amount);
+      var prepayOn=document.getElementById('opt-c-prepay')&&document.getElementById('opt-c-prepay').classList.contains('is-on');
+      var penaltyOn=document.getElementById('opt-c-penalty')&&document.getElementById('opt-c-penalty').classList.contains('is-on');
+      var ndaOn=document.getElementById('opt-c-nda')&&document.getElementById('opt-c-nda').classList.contains('is-on');
+      var portfolioOn=document.getElementById('opt-c-portfolio')&&document.getElementById('opt-c-portfolio').classList.contains('is-on');
+      var ipOn=document.getElementById('opt-c-ip')&&document.getElementById('opt-c-ip').classList.contains('is-on');
+      var bankOn=document.getElementById('opt-c-remote')&&document.getElementById('opt-c-remote').classList.contains('is-on');
+      var innExec=d.executorInn?', ИНН '+esc(d.executorInn):'';
+      var innClient=d.clientInn?', ИНН '+esc(d.clientInn):'';
+      var payBlock='';
+      if(prepayOn&&d.prepay&&parseInt(d.prepay)>0&&parseInt(d.prepay)<100){
+        var pct=parseInt(d.prepay),preAmt=formatMoney(Math.round(d.amount*pct/100)),restAmt=formatMoney(Math.round(d.amount*(100-pct)/100));
+        payBlock='<p>2.2. Оплата в два этапа: предоплата '+pct+'% ('+preAmt+') — в течение 3 рабочих дней с подписания; остаток '+(100-pct)+'% ('+restAmt+') — в течение 3 рабочих дней после подписания Акта.</p>';
+      } else { payBlock='<p>2.2. Оплата в полном объёме в течение 5 рабочих дней с момента подписания Акта.</p>'; }
+      var bankBlock='';
+      if(bankOn&&(d.bank||d.account)) bankBlock='<p>2.4. Реквизиты Исполнителя: '+(d.bank?'Банк: '+esc(d.bank)+'. ':'')+( d.account?'Счёт: '+esc(d.account)+'.':'')+'</p>';
+      var penaltyBlock=penaltyOn?'<div class="doc-section"><h2>6. Ответственность</h2><p>6.1. За просрочку оплаты Заказчик уплачивает пеню 0,1% от суммы за каждый день просрочки.</p><p>6.2. За просрочку сдачи по вине Исполнителя — пеня 0,1% в день, не более 10% от стоимости.</p><p>6.3. Стороны освобождаются от ответственности при форс-мажоре.</p></div>':'';
+      var ndaNum=5+(penaltyOn?1:0);
+      var ndaBlock=ndaOn?'<div class="doc-section"><h2>'+ndaNum+'. Конфиденциальность</h2><p>Стороны не разглашают конфиденциальную информацию третьим лицам без письменного согласия другой Стороны. Обязательство действует 2 года после окончания Договора.</p>'+(portfolioOn?'<p>Исполнитель вправе указывать факт сотрудничества в портфолио, если Заказчик не направил запрет в течение 5 дней с подписания.</p>':'')+'</div>':'';
+      var ipBlock=ipOn?'<p>4.5. Исключительные права на результат переходят к Заказчику после получения полной оплаты.</p>':'';
+      var sNum=6+(penaltyOn?1:0)+(ndaOn?1:0);
+      return '<div class="doc-header"><h1>Договор оказания услуг</h1><div class="doc-num">№ '+num+'</div></div>'
+        +'<div class="doc-meta">г. '+esc(d.city)+', '+dateStr+'</div>'
+        +'<div class="doc-parties"><p><strong>'+esc(d.executor)+'</strong>'+innExec+', самозанятый (плательщик НПД), далее «Исполнитель», и</p>'
+        +'<p><strong>'+esc(d.client)+'</strong>'+innClient+', далее «Заказчик», заключили Договор:</p></div>'
+        +'<div class="doc-section"><h2>1. Предмет</h2><p>1.1. Исполнитель оказывает: <strong>'+esc(d.service)+'</strong>. Заказчик принимает и оплачивает.</p><p>1.2. Услуги оказываются дистанционно, если иное не согласовано письменно.</p></div>'
+        +'<div class="doc-section"><h2>2. Стоимость и оплата</h2><p>2.1. Стоимость: <strong>'+amount+'</strong> ('+words+'). НДС не облагается (ФЗ № 422-ФЗ).</p>'+payBlock+'<p>2.3. Исполнитель выдаёт чек через «Мой налог» в день оплаты.</p>'+bankBlock+'</div>'
+        +'<div class="doc-section"><h2>3. Сроки</h2><p>3.1. Срок выполнения: <strong>'+esc(d.deadline)+'</strong>.</p><p>3.2. Датой исполнения считается дата подписания Акта.</p></div>'
+        +'<div class="doc-section"><h2>4. Права и обязанности</h2><p>4.1. Исполнитель оказывает Услуги качественно и в срок.</p><p>4.2. Заказчик предоставляет необходимые материалы и производит оплату в срок.</p><p>4.3. Если в течение 5 рабочих дней Заказчик не подписал Акт и не направил отказа — услуги считаются принятыми.</p>'+ipBlock+'</div>'
+        +'<div class="doc-section"><h2>5. Споры</h2><p>Споры решаются переговорами (срок ответа на претензию — 10 рабочих дней), при недостижении согласия — в суде по месту Исполнителя.</p></div>'
+        +penaltyBlock+ndaBlock
+        +'<div class="doc-section"><h2>'+sNum+'. Заключительные положения</h2><p>Договор в 2 экземплярах. Скан с подписью имеет силу оригинала. Изменения — только письменно.</p></div>'
+        +'<div class="doc-signatures">'
+        +'<div class="doc-sig-block"><p><strong>Исполнитель:</strong></p><p>'+esc(d.executor)+(d.executorInn?'<br>ИНН: '+esc(d.executorInn):'')+( d.executorContact?'<br>'+esc(d.executorContact):'')+'</p><div class="doc-sig-line"></div><p>подпись / дата</p></div>'
+        +'<div class="doc-sig-block"><p><strong>Заказчик:</strong></p><p>'+esc(d.client)+(d.clientInn?'<br>ИНН: '+esc(d.clientInn):'')+'</p><div class="doc-sig-line"></div><p>подпись / дата</p></div>'
+        +'</div>';
+    }
+
+    function buildAct(d) {
+      var num=docNum(),actDate=new Date(d.date),actDateStr=formatDateRu(actDate),amount=formatMoney(d.amount),words=amountWords(d.amount);
+      var contractOn=document.getElementById('opt-a-contract')&&document.getElementById('opt-a-contract').classList.contains('is-on');
+      var nopretOn=document.getElementById('opt-a-nopretension')&&document.getElementById('opt-a-nopretension').classList.contains('is-on');
+      var autoOn=document.getElementById('opt-a-auto-accept')&&document.getElementById('opt-a-auto-accept').classList.contains('is-on');
+      var partialOn=document.getElementById('opt-a-partial')&&document.getElementById('opt-a-partial').classList.contains('is-on');
+      var contractRef='';
+      if(contractOn&&d.contractNum) contractRef='к Договору № '+esc(d.contractNum)+(d.contractDate?' от '+esc(d.contractDate):'');
+      var partialBlock='';
+      if(partialOn&&d.paid&&parseFloat(d.paid)>0){
+        partialBlock='<p>2.4. Ранее оплачено: <strong>'+formatMoney(d.paid)+'</strong>. Остаток: <strong>'+formatMoney(Math.max(0,parseFloat(d.amount)-parseFloat(d.paid)))+'</strong>.</p>';
+      }
+      return '<div class="doc-header"><h1>Акт оказанных услуг</h1><div class="doc-num">№ '+num+'</div></div>'
+        +'<div class="doc-meta">'+actDateStr+'</div>'
+        +'<div class="doc-parties"><p><strong>Исполнитель:</strong> '+esc(d.executor)+', плательщик НПД (самозанятый)</p>'
+        +'<p><strong>Заказчик:</strong> '+esc(d.client)+'</p>'
+        +(contractRef?'<p>Настоящий Акт составлен '+contractRef+'.</p>':'')+'</div>'
+        +'<div class="doc-section"><h2>1. Оказанные услуги</h2><p>Исполнитель оказал, Заказчик принял:</p>'
+        +'<p style="margin-top:8px;padding:10px;background:rgba(99,102,241,0.05);border-left:3px solid #6366f1;border-radius:0 6px 6px 0"><strong>'+esc(d.work)+'</strong></p></div>'
+        +'<div class="doc-section"><h2>2. Стоимость и оплата</h2>'
+        +'<p>2.1. Стоимость: <strong>'+amount+'</strong> ('+words+'). НДС не облагается (ФЗ № 422-ФЗ).</p>'
+        +'<p>2.2. Услуги оказаны в полном объёме и в срок.</p>'
+        +(nopretOn?'<p>2.3. Заказчик претензий по объёму, качеству и срокам не имеет.</p>':'')
+        +partialBlock+'</div>'
+        +'<div class="doc-section"><h2>3. Приёмка</h2>'
+        +'<p>3.1. Акт является основанием для окончательных расчётов.</p>'
+        +(autoOn?'<p>3.2. Если в течение 5 рабочих дней Заказчик не подписал Акт и не направил отказа — услуги считаются принятыми.</p>':'')
+        +'<p>'+(autoOn?'3.3':'3.2')+'. Акт в 2 экземплярах. Скан с подписью имеет силу оригинала.</p></div>'
+        +'<div class="doc-signatures">'
+        +'<div class="doc-sig-block"><p><strong>Исполнитель:</strong></p><p>'+esc(d.executor)+'</p><div class="doc-sig-line"></div><p>подпись / дата</p></div>'
+        +'<div class="doc-sig-block"><p><strong>Заказчик:</strong></p><p>'+esc(d.client)+'</p><div class="doc-sig-line"></div><p>подпись / дата</p></div>'
+        +'</div>';
+    }
+
+    function buildKp(d) {
+      var amount=formatMoney(d.amount);
+      var validOn=document.getElementById('opt-k-valid')&&document.getElementById('opt-k-valid').classList.contains('is-on');
+      var processOn=document.getElementById('opt-k-process')&&document.getElementById('opt-k-process').classList.contains('is-on');
+      var legalOn=document.getElementById('opt-k-legal')&&document.getElementById('opt-k-legal').classList.contains('is-on');
+      var guaranteeOn=document.getElementById('opt-k-guarantee')&&document.getElementById('opt-k-guarantee').classList.contains('is-on');
+      var processBlock=processOn?'<div class="doc-section"><h2>Порядок работы</h2><p>1. Согласуем задачу, фиксируем ТЗ.</p><p>2. Предоплата — приступаю к работе.</p><p>3. Сдаю результат, вношу правки.</p><p>4. Подписываем Акт, финальный расчёт.</p><p>5. Выдаю чек через «Мой налог».</p></div>':'';
+      var legalBlock=legalOn?'<div class="doc-section"><h2>Работаю официально</h2><p>Я самозанятый (НПД). Вы получаете <strong>договор, акт и чек</strong>. Расходы включаете в затраты компании. Никаких серых схем.</p></div>':'';
+      var guaranteeBlock=(guaranteeOn&&d.guarantee)?'<div class="doc-section"><h2>Гарантия и правки</h2><p>'+esc(d.guarantee)+'</p></div>':'';
+      var validBlock=(validOn&&d.valid)?'<div class="doc-section"><p><strong>Предложение действительно до: '+esc(d.valid)+'</strong></p></div>':'';
+      return '<div class="doc-kp-header"><h1>Коммерческое предложение</h1><p>'+esc(d.title)+'</p></div>'
+        +'<p>Уважаемый(ая) <strong>'+esc(d.client)+'</strong>,</p>'
+        +'<p style="margin-top:10px">предлагаю Вашему вниманию КП по услуге <strong>«'+esc(d.title)+'»</strong>.</p>'
+        +'<div class="doc-section" style="margin-top:18px"><h2>Что входит в работу</h2><p>'+esc(d.description)+'</p></div>'
+        +'<div class="doc-kp-price"><div class="price-label">Стоимость</div><div class="price-value">'+amount+'</div><div style="font-size:12px;color:#888;margin-top:4px">НДС не облагается — самозанятый, ФЗ № 422</div></div>'
+        +'<div class="doc-section"><h2>Срок выполнения</h2><p><strong>'+esc(d.term)+'</strong></p></div>'
+        +processBlock+guaranteeBlock+legalBlock+validBlock
+        +'<p style="margin-top:18px">Готов приступить после согласования. Пишите — отвечу быстро.</p>'
+        +'<div class="doc-kp-footer"><div><strong>'+esc(d.executor)+'</strong><br>Исполнитель, самозанятый'+(d.contact?'<br>'+esc(d.contact):'')+'</div><div style="text-align:right">'+dateStr+'</div></div>';
+    }
+
+    // === AUTH ===
+    var authModal = document.getElementById('auth-modal');
+    var authTabs = document.querySelectorAll('.auth-tabs .tab');
+    authTabs.forEach(function(t){ t.addEventListener('click', function(){ switchAuthTab(t.dataset.authTab); }); });
+
+    function openAuthModal(tab) {
+      switchAuthTab(tab || activeAuthTab);
+      authModal.classList.add('is-open');
+      authModal.setAttribute('aria-hidden','false');
+      document.body.style.overflow='hidden';
+    }
+    function closeAuthModal() {
+      authModal.classList.remove('is-open');
+      authModal.setAttribute('aria-hidden','true');
+      document.body.style.overflow='';
+    }
+    document.getElementById('auth-modal-close').addEventListener('click', closeAuthModal);
+    authModal.addEventListener('click', function(e){ if(e.target===authModal)closeAuthModal(); });
+
+    document.getElementById('header-btn-login').addEventListener('click', function(){ openAuthModal('login'); });
+    document.getElementById('btn-logout').addEventListener('click', function(){
+      clearToken(); currentUser=null; updateHeader();
+    });
+
+    function switchAuthTab(name) {
+      activeAuthTab = name;
+      if (name === 'register') resetRegisterStep();
+      authTabs.forEach(function(t){ t.classList.toggle('is-active', t.dataset.authTab===name); });
+      document.querySelectorAll('.auth-tabs ~ .tab-panel').forEach(function(p){
+        p.classList.toggle('is-active', p.id==='panel-auth-'+name);
+      });
+      document.getElementById('btn-auth-submit').textContent = name==='login' ? 'Войти' : 'Зарегистрироваться';
+      hideAuthError();
+    }
+
+    function showAuthError(msg){ var e=document.getElementById('auth-error'); e.textContent=msg; e.classList.add('is-visible'); }
+    function hideAuthError(){ var e=document.getElementById('auth-error'); e.textContent=''; e.classList.remove('is-visible'); }
+
+    // Verify
+    function startResendTimer(){
+      var secs=60,btn=document.getElementById('btn-resend'),timerEl=document.getElementById('resend-timer');
+      btn.disabled=true; timerEl.textContent=secs;
+      clearInterval(resendInterval);
+      resendInterval=setInterval(function(){secs--;timerEl.textContent=secs;if(secs<=0){clearInterval(resendInterval);btn.disabled=false;btn.textContent='Отправить повторно';}},1000);
+    }
+    function showVerifyStep(email){
+      registerStep=2; registerEmail=email;
+      document.getElementById('register-fields').style.display='none';
+      document.getElementById('verify-step').classList.add('is-visible');
+      document.getElementById('verify-email-shown').textContent=email;
+      document.getElementById('btn-auth-submit').textContent='Подтвердить';
+      document.getElementById('verify-code').focus();
+      startResendTimer();
+    }
+    function resetRegisterStep(){
+      registerStep=1; registerEmail='';
+      document.getElementById('register-fields').style.display='';
+      document.getElementById('verify-step').classList.remove('is-visible');
+      document.getElementById('verify-code').value='';
+      document.getElementById('btn-auth-submit').textContent='Зарегистрироваться';
+      clearInterval(resendInterval);
+    }
+
+    document.getElementById('btn-resend').addEventListener('click', async function(){
+      if(!registerEmail)return;
+      this.disabled=true; hideAuthError();
+      try{
+        var r=await apiFetch('/api/verify/send',{method:'POST',body:JSON.stringify({email:registerEmail}),auth:false});
+        if(!r.res.ok)showAuthError(r.data.error||'Ошибка отправки');
+        else startResendTimer();
+      }catch(e){showAuthError('Ошибка сети');this.disabled=false;}
+    });
+
+    document.getElementById('btn-auth-submit').addEventListener('click', submitAuth);
+
+    async function submitAuth(){
+      var btn=document.getElementById('btn-auth-submit');
+      btn.disabled=true; hideAuthError();
+
+      if(activeAuthTab==='login'){
+        var form=document.getElementById('form-login');
+        if(!form.reportValidity()){btn.disabled=false;return;}
+        var data=Object.fromEntries(new FormData(form));
+        try{
+          var r=await apiFetch('/api/login',{method:'POST',body:JSON.stringify(data),auth:false});
+          if(!r.res.ok){showAuthError(r.data.error||'Ошибка входа');return;}
+          setToken(r.data.token); currentUser=r.data.user; updateHeader(); closeAuthModal();
+        }catch(e){showAuthError('Нет связи с сервером');}
+        finally{btn.disabled=false;}
+        return;
+      }
+
+      if(activeAuthTab==='register'&&registerStep===1){
+        var form=document.getElementById('form-register');
+        if(!form.reportValidity()){btn.disabled=false;return;}
+        var data=Object.fromEntries(new FormData(form));
+        try{
+          var r=await apiFetch('/api/verify/send',{method:'POST',body:JSON.stringify({email:data.email}),auth:false});
+          if(!r.res.ok){showAuthError(r.data.error||'Ошибка отправки кода');return;}
+          showVerifyStep(data.email);
+        }catch(e){showAuthError('Нет связи с сервером');}
+        finally{btn.disabled=false;}
+        return;
+      }
+
+      if(activeAuthTab==='register'&&registerStep===2){
+        var code=document.getElementById('verify-code').value.trim();
+        if(!code||code.length!==6){showAuthError('Введите 6-значный код');btn.disabled=false;return;}
+        var form=document.getElementById('form-register');
+        var data=Object.fromEntries(new FormData(form));
+        try{
+          var r=await apiFetch('/api/register',{method:'POST',body:JSON.stringify({email:registerEmail,password:data.password,code:code}),auth:false});
+          if(!r.res.ok){showAuthError(r.data.error||'Ошибка регистрации');return;}
+          setToken(r.data.token); currentUser=r.data.user; resetRegisterStep(); updateHeader(); closeAuthModal();
+        }catch(e){showAuthError('Нет связи с сервером');}
+        finally{btn.disabled=false;}
+        return;
+      }
+    }
+
+    // === HEADER / USER ===
+    function updateHeader(){
+      var loggedIn=!!(getToken()&&currentUser);
+      document.getElementById('header-btn-login').classList.toggle('hidden-block',loggedIn);
+      var emailEl=document.getElementById('user-email');
+      emailEl.textContent=loggedIn?currentUser.email:'';
+      emailEl.classList.toggle('hidden-block',!loggedIn);
+      document.getElementById('btn-logout').classList.toggle('hidden-block',!loggedIn);
+      var badge=document.getElementById('plan-badge-header');
+      if(loggedIn&&currentUser.plan==='pro'){
+        badge.classList.remove('hidden-block');
+        badge.textContent=currentUser.planDaysLeft?'⚡ Pro · '+currentUser.planDaysLeft+' дн.':'⚡ Pro';
+      } else { badge.classList.add('hidden-block'); }
+      var banner=document.getElementById('expiry-banner');
+      if(loggedIn&&currentUser.planExpiringSoon){
+        document.getElementById('expiry-banner-text').textContent='⚠️ Подписка Pro истекает через '+currentUser.planDaysLeft+' дн.';
+        banner.classList.remove('is-hidden');
+      } else { banner.classList.add('is-hidden'); }
+    }
+
+    async function initAuth(){
+      if(!getToken())return;
+      try{
+        var r=await apiFetch('/api/me');
+        if(r.res.ok){ currentUser=r.data.user; updateHeader(); }
+        else{ clearToken(); updateHeader(); }
+      }catch(e){}
+    }
+    initAuth();
+
+    // === PRO MODAL ===
+    var proModal=document.getElementById('pro-modal');
+    document.getElementById('plan-badge-header').addEventListener('click',openProModal);
+    document.getElementById('pro-modal-close').addEventListener('click',closeProModal);
+    proModal.addEventListener('click',function(e){if(e.target===proModal)closeProModal();});
+    document.getElementById('expiry-banner-btn').addEventListener('click',openProModal);
+    document.getElementById('btn-pay').addEventListener('click',handlePay);
+
+    function openProModal(){
+      var info=document.getElementById('pro-modal-current-plan');
+      if(currentUser&&currentUser.plan==='pro'&&currentUser.planDaysLeft){
+        info.style.display='block';
+        info.textContent='✓ Pro активен · осталось '+currentUser.planDaysLeft+' дн. · оплата продлит срок';
+        document.getElementById('btn-pay').textContent='Продлить — 499 ₽';
+      } else { info.style.display='none'; document.getElementById('btn-pay').textContent='Перейти к оплате — 499 ₽'; }
+      proModal.classList.add('is-open'); proModal.setAttribute('aria-hidden','false'); document.body.style.overflow='hidden';
+    }
+    function closeProModal(){ proModal.classList.remove('is-open'); proModal.setAttribute('aria-hidden','true'); document.body.style.overflow=''; }
+
+    async function handlePay(){
+      if(!getToken()||!currentUser){ closeProModal(); openAuthModal('register'); return; }
+      var btn=document.getElementById('btn-pay');
+      btn.disabled=true; btn.textContent='Создаём платёж...';
+      try{
+        var r=await apiFetch('/api/payment/create',{method:'POST'});
+        if(!r.res.ok){alert(r.data.error||'Ошибка платежа');btn.disabled=false;btn.textContent='Перейти к оплате — 499 ₽';return;}
+        window.location.href=r.data.url;
+      }catch(e){alert('Нет связи с сервером');btn.disabled=false;btn.textContent='Перейти к оплате — 499 ₽';}
+    }
+
+  })();
+  </script>
+</body>
+</html>
