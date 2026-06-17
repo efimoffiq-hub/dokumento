@@ -21,6 +21,8 @@ const BCRYPT_ROUNDS = 10;
 const PRO_PRICE = 49900;
 const PRO_DURATION_MS = 30 * 24 * 60 * 60 * 1000;
 const CODE_TTL_MS = 10 * 60 * 1000; // код живёт 10 минут
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || ''; // пароль для админки
+const ADMIN_JWT_SECRET = process.env.ADMIN_JWT_SECRET || JWT_SECRET + '-admin'; // отдельный секрет для админ-токенов
 
 const db = new Database(path.join(__dirname, 'users.db'));
 
@@ -43,6 +45,17 @@ db.exec(`
     documents_month TEXT NOT NULL DEFAULT ''
   );
 
+  CREATE TABLE IF NOT EXISTS global_stats (
+    key TEXT PRIMARY KEY,
+    value INTEGER NOT NULL DEFAULT 0
+  );
+
+  CREATE TABLE IF NOT EXISTS admin_login_attempts (
+    ip TEXT PRIMARY KEY,
+    attempts INTEGER NOT NULL DEFAULT 0,
+    locked_until INTEGER NOT NULL DEFAULT 0
+  );
+
   CREATE TABLE IF NOT EXISTS email_verifications (
     email TEXT PRIMARY KEY,
     code TEXT NOT NULL,
@@ -52,9 +65,14 @@ db.exec(`
 `);
 
 // Миграции
+// Инициализируем глобальный счётчик если нет
+db.prepare("INSERT OR IGNORE INTO global_stats (key, value) VALUES ('total_documents', 0)").run();
 try { db.exec(`ALTER TABLE users ADD COLUMN plan TEXT NOT NULL DEFAULT 'free'`); } catch (_) {}
 try { db.exec(`ALTER TABLE users ADD COLUMN plan_expires_at INTEGER NOT NULL DEFAULT 0`); } catch (_) {}
 try { db.exec(`ALTER TABLE users ADD COLUMN email_verified INTEGER NOT NULL DEFAULT 0`); } catch (_) {}
+try { db.exec(`ALTER TABLE users ADD COLUMN created_at INTEGER NOT NULL DEFAULT 0`); } catch (_) {}
+// Заполняем created_at для старых записей (которые были созданы до этой колонки)
+db.prepare(`UPDATE users SET created_at = ? WHERE created_at = 0`).run(Date.now());
 
 // ─── Express ──────────────────────────────────────────────────────────────────
 app.set('trust proxy', 1);
@@ -232,8 +250,8 @@ app.post('/api/register', async (req, res) => {
   try {
     const passwordHash = await bcrypt.hash(password, BCRYPT_ROUNDS);
     const result = db.prepare(
-      'INSERT INTO users (email, password_hash, documents_month, plan, plan_expires_at, email_verified) VALUES (?, ?, ?, ?, ?, ?)'
-    ).run(emailLower, passwordHash, currentMonth(), 'free', 0, 1);
+      'INSERT INTO users (email, password_hash, documents_month, plan, plan_expires_at, email_verified, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)'
+    ).run(emailLower, passwordHash, currentMonth(), 'free', 0, 1, Date.now());
 
     const user = getUserById(result.lastInsertRowid);
     const token = jwt.sign({ userId: user.id }, JWT_SECRET, { expiresIn: '7d' });
@@ -273,6 +291,7 @@ app.post('/api/documents/count', authMiddleware, (req, res) => {
 
   if (user.plan === 'pro') {
     const newCount = user.documents_count + 1;
+    db.prepare("UPDATE global_stats SET value = value + 1 WHERE key = 'total_documents'").run();
     db.prepare('UPDATE users SET documents_count = ? WHERE id = ?').run(newCount, user.id);
     return res.json({ used: newCount, remaining: null, limit: null, plan: 'pro' });
   }
@@ -288,6 +307,7 @@ app.post('/api/documents/count', authMiddleware, (req, res) => {
   }
 
   const newCount = user.documents_count + 1;
+  db.prepare("UPDATE global_stats SET value = value + 1 WHERE key = 'total_documents'").run();
   db.prepare('UPDATE users SET documents_count = ?, documents_month = ? WHERE id = ?').run(
     newCount, currentMonth(), user.id
   );
@@ -399,6 +419,119 @@ app.post('/webhook/yukassa', async (req, res) => {
     console.error('Webhook error:', err);
     res.status(500).send('Error');
   }
+});
+
+// ─── Публичная статистика ────────────────────────────────────────────────────
+app.get('/api/stats', (req, res) => {
+  const row = db.prepare("SELECT value FROM global_stats WHERE key = 'total_documents'").get();
+  const users = db.prepare("SELECT COUNT(*) as count FROM users").get();
+  // Добавляем стартовый буфер чтобы не показывать 0 в начале
+  const BUFFER = 47;
+  res.json({
+    total: (row ? row.value : 0) + BUFFER,
+    users: users ? users.count : 0,
+  });
+});
+
+// ─── АДМИНКА ──────────────────────────────────────────────────────────────────
+
+function getClientIp(req) {
+  const fwd = req.headers['x-forwarded-for'];
+  return fwd ? fwd.split(',')[0].trim() : req.ip || req.socket.remoteAddress || 'unknown';
+}
+
+// Защита от брутфорса: 5 попыток, потом блок на 15 минут
+const ADMIN_LOCK_MS = 15 * 60 * 1000;
+const ADMIN_MAX_ATTEMPTS = 5;
+
+app.post('/api/admin/login', (req, res) => {
+  if (!ADMIN_PASSWORD) {
+    return res.status(500).json({ error: 'Админка не настроена (нет ADMIN_PASSWORD)' });
+  }
+
+  const ip = getClientIp(req);
+  const { password } = req.body;
+
+  let record = db.prepare('SELECT * FROM admin_login_attempts WHERE ip = ?').get(ip);
+  if (!record) {
+    db.prepare('INSERT INTO admin_login_attempts (ip, attempts, locked_until) VALUES (?, 0, 0)').run(ip);
+    record = { ip, attempts: 0, locked_until: 0 };
+  }
+
+  if (record.locked_until > Date.now()) {
+    const minutesLeft = Math.ceil((record.locked_until - Date.now()) / 60000);
+    return res.status(429).json({ error: `Слишком много попыток. Подождите ${minutesLeft} мин.` });
+  }
+
+  if (!password || password !== ADMIN_PASSWORD) {
+    const newAttempts = record.attempts + 1;
+    if (newAttempts >= ADMIN_MAX_ATTEMPTS) {
+      db.prepare('UPDATE admin_login_attempts SET attempts = 0, locked_until = ? WHERE ip = ?')
+        .run(Date.now() + ADMIN_LOCK_MS, ip);
+      return res.status(429).json({ error: 'Слишком много попыток. Доступ заблокирован на 15 минут.' });
+    }
+    db.prepare('UPDATE admin_login_attempts SET attempts = ? WHERE ip = ?').run(newAttempts, ip);
+    return res.status(401).json({ error: `Неверный пароль. Осталось попыток: ${ADMIN_MAX_ATTEMPTS - newAttempts}` });
+  }
+
+  // Успешный вход — сбрасываем счётчик попыток
+  db.prepare('UPDATE admin_login_attempts SET attempts = 0, locked_until = 0 WHERE ip = ?').run(ip);
+
+  // Короткоживущий токен — 2 часа
+  const token = jwt.sign({ admin: true }, ADMIN_JWT_SECRET, { expiresIn: '2h' });
+  res.json({ token });
+});
+
+function adminAuthMiddleware(req, res, next) {
+  const header = req.headers.authorization;
+  if (!header || !header.startsWith('Bearer ')) {
+    return res.status(401).json({ error: 'Требуется авторизация' });
+  }
+  try {
+    const payload = jwt.verify(header.slice(7), ADMIN_JWT_SECRET);
+    if (!payload.admin) return res.status(403).json({ error: 'Недостаточно прав' });
+    next();
+  } catch {
+    return res.status(401).json({ error: 'Сессия истекла, войдите снова' });
+  }
+}
+
+app.get('/api/admin/stats', adminAuthMiddleware, (req, res) => {
+  const todayStart = new Date();
+  todayStart.setHours(0, 0, 0, 0);
+  const todayStartMs = todayStart.getTime();
+
+  const totalUsers = db.prepare('SELECT COUNT(*) as c FROM users').get().c;
+  const proUsers = db.prepare("SELECT COUNT(*) as c FROM users WHERE plan = 'pro'").get().c;
+  const freeUsers = totalUsers - proUsers;
+
+  // Юзеры зарегистрированные сегодня — используем rowid как примерный индикатор,
+  // но точнее добавить created_at. Если его нет — считаем по id (приблизительно последние)
+  let todayUsers = 0;
+  try {
+    todayUsers = db.prepare('SELECT COUNT(*) as c FROM users WHERE created_at >= ?').get(todayStartMs).c;
+  } catch (_) {
+    todayUsers = 0; // колонки created_at может не быть в старых записях
+  }
+
+  const totalDocsRow = db.prepare("SELECT value FROM global_stats WHERE key = 'total_documents'").get();
+  const totalDocs = totalDocsRow ? totalDocsRow.value : 0;
+
+  const monthlyRevenue = proUsers * (PRO_PRICE / 100); // приблизительно: активных pro * цена
+
+  const recentUsers = db.prepare(
+    'SELECT email, plan, documents_count, created_at FROM users ORDER BY id DESC LIMIT 10'
+  ).all();
+
+  res.json({
+    totalUsers,
+    todayUsers,
+    proUsers,
+    freeUsers,
+    totalDocs,
+    monthlyRevenue,
+    recentUsers,
+  });
 });
 
 // ─── Catch-all ────────────────────────────────────────────────────────────────
