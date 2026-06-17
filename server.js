@@ -77,6 +77,29 @@ db.prepare(`UPDATE users SET created_at = ? WHERE created_at = 0`).run(Date.now(
 // ─── Express ──────────────────────────────────────────────────────────────────
 app.set('trust proxy', 1);
 app.use(cors());
+
+// ─── Security headers ────────────────────────────────────────────────────────
+app.use((req, res, next) => {
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('X-Frame-Options', 'DENY');
+  res.setHeader('Content-Security-Policy', "frame-ancestors 'none'");
+  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+  next();
+});
+
+// Блокируем доступ к системным/конфигурационным файлам
+const BLOCKED_FILES = [
+  '/package.json', '/package-lock.json', '/server.js', '/railway.json',
+  '/.env', '/.gitignore', '/users.db', '/node_modules',
+];
+app.use((req, res, next) => {
+  const lowerPath = req.path.toLowerCase();
+  if (BLOCKED_FILES.some(f => lowerPath === f || lowerPath.startsWith(f + '/'))) {
+    return res.status(404).send('Not found');
+  }
+  next();
+});
+
 app.use(express.static(__dirname));
 app.use('/webhook/yukassa', express.raw({ type: 'application/json' }));
 app.use(express.json());
