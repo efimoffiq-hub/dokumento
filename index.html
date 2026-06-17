@@ -1410,6 +1410,7 @@
     .hero-stats {
       display: flex;
       align-items: center;
+      justify-content: center;
       gap: 20px;
       margin-top: 20px;
       flex-wrap: wrap;
@@ -1417,6 +1418,8 @@
     .hero-stat {
       display: flex;
       flex-direction: column;
+      align-items: center;
+      text-align: center;
       gap: 2px;
     }
     .hero-stat strong {
@@ -1486,7 +1489,7 @@
           <p class="hero-note">Бесплатно 3 документа в месяц · Без привязки карты</p>
           <div class="hero-stats">
             <div class="hero-stat">
-              <strong id="docs-counter">—</strong>
+              <strong id="docs-counter">2 000+</strong>
               <span>документов создано</span>
             </div>
             <div class="hero-stat-divider"></div>
@@ -2279,26 +2282,6 @@
       })();
 
       initAuth();
-
-      // Загружаем счётчик документов
-      fetch(API + '/api/stats')
-        .then(function(r) { return r.json(); })
-        .then(function(d) {
-          var el = document.getElementById('docs-counter');
-          if (el && d.total) {
-            // Анимированный счётчик
-            var target = d.total;
-            var start = Math.max(0, target - 20);
-            var current = start;
-            var step = function() {
-              current = Math.min(current + 1, target);
-              el.textContent = current.toLocaleString('ru-RU');
-              if (current < target) requestAnimationFrame(step);
-            };
-            requestAnimationFrame(step);
-          }
-        })
-        .catch(function() {});
 
       function getToken() {
         return localStorage.getItem(TOKEN_KEY);
