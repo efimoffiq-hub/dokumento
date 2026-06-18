@@ -1706,6 +1706,7 @@
             </div>
           </div>
         </form>
+        <button type="button" class="verify-resend" id="btn-forgot-password" style="margin-top:10px">Забыли пароль?</button>
       </div>
 
       <div class="tab-panel" id="panel-auth-register" role="tabpanel">
@@ -1720,6 +1721,10 @@
               <label for="register-password">Пароль</label>
               <input type="password" id="register-password" name="password" placeholder="Минимум 6 символов" minlength="6" required>
             </div>
+            <div class="form-group full">
+              <label for="register-promo">Промокод <span style="color:var(--text-muted);font-weight:400">(необязательно)</span></label>
+              <input type="text" id="register-promo" name="promo" placeholder="Например, START3" style="text-transform:uppercase">
+            </div>
           </div>
         </form>
 
@@ -1733,6 +1738,34 @@
             Отправить код повторно (<span id="resend-timer">60</span>с)
           </button>
         </div>
+      </div>
+
+      <!-- Восстановление пароля -->
+      <div class="tab-panel" id="panel-forgot-password" role="tabpanel">
+        <div id="forgot-step-1">
+          <div class="form-grid">
+            <div class="form-group full">
+              <label for="forgot-email">Email</label>
+              <input type="email" id="forgot-email" placeholder="you@example.com" required>
+            </div>
+          </div>
+          <button type="button" class="btn btn-primary btn-generate" id="btn-send-forgot-code" style="margin-top:14px">Отправить код</button>
+        </div>
+        <div class="verify-step" id="forgot-step-2">
+          <p class="verify-email-hint">Отправили код на <strong id="forgot-email-shown"></strong></p>
+          <div class="code-input-wrap">
+            <input type="text" id="forgot-code" placeholder="000000" maxlength="6" inputmode="numeric" autocomplete="one-time-code">
+          </div>
+          <div class="form-group full" style="margin-top:10px">
+            <label for="forgot-new-password">Новый пароль</label>
+            <input type="password" id="forgot-new-password" placeholder="Минимум 6 символов" minlength="6">
+          </div>
+          <button type="button" class="btn btn-primary btn-generate" id="btn-submit-reset">Сменить пароль</button>
+          <button type="button" class="verify-resend" id="btn-forgot-resend" disabled>
+            Отправить код повторно (<span id="forgot-resend-timer">60</span>с)
+          </button>
+        </div>
+        <button type="button" class="verify-resend" id="btn-back-to-login" style="margin-top:10px">← Назад ко входу</button>
       </div>
 
       <div class="form-error" id="auth-error"></div>
@@ -2516,6 +2549,99 @@
         }
       });
 
+      // === FORGOT PASSWORD ===
+      var forgotStep = 1;
+      var forgotEmail = '';
+      var forgotResendInterval = null;
+
+      function showForgotPasswordScreen() {
+        document.querySelectorAll('.tab-panel').forEach(function(p) { p.classList.remove('is-active'); });
+        document.getElementById('panel-forgot-password').classList.add('is-active');
+        document.querySelector('.auth-tabs').style.display = 'none';
+        document.getElementById('btn-auth-submit').style.display = 'none';
+        forgotStep = 1;
+        document.getElementById('forgot-step-1').style.display = '';
+        document.getElementById('forgot-step-2').classList.remove('is-visible');
+        document.getElementById('forgot-email').value = '';
+        hideAuthError();
+      }
+
+      function backToLoginFromForgot() {
+        document.querySelector('.auth-tabs').style.display = '';
+        document.getElementById('btn-auth-submit').style.display = '';
+        clearInterval(forgotResendInterval);
+        switchAuthTab('login');
+      }
+
+      document.getElementById('btn-forgot-password').addEventListener('click', showForgotPasswordScreen);
+      document.getElementById('btn-back-to-login').addEventListener('click', backToLoginFromForgot);
+      document.getElementById('btn-send-forgot-code').addEventListener('click', sendForgotCode);
+      document.getElementById('btn-submit-reset').addEventListener('click', submitResetPassword);
+
+      function startForgotResendTimer() {
+        var secs = 60;
+        var btn = document.getElementById('btn-forgot-resend');
+        var timerEl = document.getElementById('forgot-resend-timer');
+        btn.disabled = true;
+        timerEl.textContent = secs;
+        clearInterval(forgotResendInterval);
+        forgotResendInterval = setInterval(function() {
+          secs--;
+          timerEl.textContent = secs;
+          if (secs <= 0) {
+            clearInterval(forgotResendInterval);
+            btn.disabled = false;
+            btn.textContent = 'Отправить повторно';
+          }
+        }, 1000);
+      }
+
+      async function sendForgotCode() {
+        var email = document.getElementById('forgot-email').value.trim();
+        if (!email) { showAuthError('Введите email'); return; }
+        hideAuthError();
+        try {
+          var result = await apiFetch('/api/forgot-password', {
+            method: 'POST',
+            body: JSON.stringify({ email: email }),
+            auth: false,
+          });
+          if (!result.res.ok) { showAuthError(result.data.error || 'Ошибка отправки'); return false; }
+          forgotEmail = email;
+          forgotStep = 2;
+          document.getElementById('forgot-step-1').style.display = 'none';
+          document.getElementById('forgot-email-shown').textContent = email;
+          document.getElementById('forgot-step-2').classList.add('is-visible');
+          startForgotResendTimer();
+          return true;
+        } catch(e) {
+          showAuthError('Не удалось связаться с сервером');
+          return false;
+        }
+      }
+
+      document.getElementById('btn-forgot-resend').addEventListener('click', sendForgotCode);
+
+      async function submitResetPassword() {
+        var code = document.getElementById('forgot-code').value.trim();
+        var newPassword = document.getElementById('forgot-new-password').value;
+        if (!code || code.length !== 6) { showAuthError('Введите 6-значный код'); return; }
+        if (!newPassword || newPassword.length < 6) { showAuthError('Пароль должен быть не менее 6 символов'); return; }
+        try {
+          var result = await apiFetch('/api/reset-password', {
+            method: 'POST',
+            body: JSON.stringify({ email: forgotEmail, code: code, newPassword: newPassword }),
+            auth: false,
+          });
+          if (!result.res.ok) { showAuthError(result.data.error || 'Ошибка'); return; }
+          showAuthError('');
+          alert('Пароль изменён! Теперь войдите с новым паролем.');
+          backToLoginFromForgot();
+        } catch(e) {
+          showAuthError('Не удалось связаться с сервером');
+        }
+      }
+
       async function submitAuth() {
         var btn = document.getElementById('btn-auth-submit');
         btn.disabled = true;
@@ -2580,7 +2706,7 @@
           try {
             var result = await apiFetch('/api/register', {
               method: 'POST',
-              body: JSON.stringify({ email: registerEmail, password: data.password, code: code }),
+              body: JSON.stringify({ email: registerEmail, password: data.password, code: code, promo: data.promo || '' }),
               auth: false,
             });
             if (!result.res.ok) { showAuthError(result.data.error || 'Ошибка регистрации'); return; }

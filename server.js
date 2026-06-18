@@ -21,6 +21,8 @@ const BCRYPT_ROUNDS = 10;
 const PRO_PRICE = 49900;
 const PRO_DURATION_MS = 30 * 24 * 60 * 60 * 1000;
 const CODE_TTL_MS = 10 * 60 * 1000; // код живёт 10 минут
+const TRIAL_PROMO_CODE = process.env.TRIAL_PROMO_CODE || 'START3'; // промокод на 3 дня pro
+const TRIAL_DAYS = 3;
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || ''; // пароль для админки
 const ADMIN_JWT_SECRET = process.env.ADMIN_JWT_SECRET || JWT_SECRET + '-admin'; // отдельный секрет для админ-токенов
 
@@ -54,6 +56,12 @@ db.exec(`
     ip TEXT PRIMARY KEY,
     attempts INTEGER NOT NULL DEFAULT 0,
     locked_until INTEGER NOT NULL DEFAULT 0
+  );
+
+  CREATE TABLE IF NOT EXISTS promo_used (
+    email TEXT PRIMARY KEY,
+    code TEXT NOT NULL,
+    used_at INTEGER NOT NULL
   );
 
   CREATE TABLE IF NOT EXISTS email_verifications (
@@ -187,6 +195,36 @@ async function sendVerificationEmail(email, code) {
   return res.ok;
 }
 
+async function sendPasswordResetEmail(email, code) {
+  if (!RESEND_API_KEY) {
+    console.log(`[DEV] Код восстановления пароля для ${email}: ${code}`);
+    return true;
+  }
+  const res = await fetch('https://api.resend.com/emails', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${RESEND_API_KEY}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      from: FROM_EMAIL,
+      to: email,
+      subject: 'Восстановление пароля — Документо',
+      html: `
+        <div style="font-family:Inter,sans-serif;max-width:480px;margin:0 auto;padding:32px 24px">
+          <div style="font-size:1.4rem;font-weight:800;margin-bottom:24px">Документо</div>
+          <p style="font-size:1rem;color:#333;margin-bottom:16px">Код для восстановления пароля:</p>
+          <div style="font-size:2.5rem;font-weight:800;letter-spacing:0.15em;color:#6366f1;
+                      background:#f0f0ff;border-radius:12px;padding:20px;text-align:center;
+                      margin-bottom:24px">${code}</div>
+          <p style="font-size:0.85rem;color:#888">Код действует 10 минут. Если вы не запрашивали восстановление пароля — просто проигнорируйте письмо.</p>
+        </div>
+      `,
+    }),
+  });
+  return res.ok;
+}
+
 // ─── Auth middleware ──────────────────────────────────────────────────────────
 function authMiddleware(req, res, next) {
   const header = req.headers.authorization;
@@ -242,7 +280,7 @@ app.post('/api/verify/send', async (req, res) => {
 
 // ─── Шаг 2: Проверить код и зарегистрировать ─────────────────────────────────
 app.post('/api/register', async (req, res) => {
-  const { email, password, code } = req.body;
+  const { email, password, code, promo } = req.body;
 
   if (!email || !password) return res.status(400).json({ error: 'Укажите email и пароль' });
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return res.status(400).json({ error: 'Некорректный email' });
@@ -272,17 +310,96 @@ app.post('/api/register', async (req, res) => {
 
   try {
     const passwordHash = await bcrypt.hash(password, BCRYPT_ROUNDS);
+
+    // Проверяем промокод (если указан)
+    let plan = 'free';
+    let planExpiresAt = 0;
+    let promoApplied = false;
+
+    if (promo && String(promo).trim().toUpperCase() === TRIAL_PROMO_CODE) {
+      const alreadyUsed = db.prepare('SELECT email FROM promo_used WHERE email = ?').get(emailLower);
+      if (!alreadyUsed) {
+        plan = 'pro';
+        planExpiresAt = Date.now() + TRIAL_DAYS * 24 * 60 * 60 * 1000;
+        promoApplied = true;
+      }
+    }
+
     const result = db.prepare(
       'INSERT INTO users (email, password_hash, documents_month, plan, plan_expires_at, email_verified, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)'
-    ).run(emailLower, passwordHash, currentMonth(), 'free', 0, 1, Date.now());
+    ).run(emailLower, passwordHash, currentMonth(), plan, planExpiresAt, 1, Date.now());
+
+    if (promoApplied) {
+      db.prepare('INSERT INTO promo_used (email, code, used_at) VALUES (?, ?, ?)').run(emailLower, TRIAL_PROMO_CODE, Date.now());
+    }
 
     const user = getUserById(result.lastInsertRowid);
     const token = jwt.sign({ userId: user.id }, JWT_SECRET, { expiresIn: '7d' });
-    res.status(201).json({ token, user: userPayload(user) });
+    res.status(201).json({ token, user: userPayload(user), promoApplied });
   } catch (err) {
     console.error('Register error:', err);
     res.status(500).json({ error: 'Ошибка сервера' });
   }
+});
+
+// ─── Восстановление пароля ────────────────────────────────────────────────────
+app.post('/api/forgot-password', async (req, res) => {
+  const { email } = req.body;
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    return res.status(400).json({ error: 'Некорректный email' });
+  }
+  const emailLower = email.toLowerCase();
+
+  const user = db.prepare('SELECT id FROM users WHERE email = ?').get(emailLower);
+  // Не раскрываем существует ли email — стандартная практика безопасности
+  if (!user) {
+    return res.json({ ok: true, message: 'Если аккаунт существует, код отправлен на почту' });
+  }
+
+  const prev = db.prepare('SELECT expires_at FROM email_verifications WHERE email = ?').get(emailLower);
+  if (prev && prev.expires_at - CODE_TTL_MS + 60000 > Date.now()) {
+    return res.status(429).json({ error: 'Подождите минуту перед повторной отправкой' });
+  }
+
+  const code = generateCode();
+  const expiresAt = Date.now() + CODE_TTL_MS;
+
+  db.prepare(`
+    INSERT INTO email_verifications (email, code, expires_at, attempts)
+    VALUES (?, ?, ?, 0)
+    ON CONFLICT(email) DO UPDATE SET code = excluded.code, expires_at = excluded.expires_at, attempts = 0
+  `).run(emailLower, code, expiresAt);
+
+  await sendPasswordResetEmail(emailLower, code);
+  res.json({ ok: true, message: 'Если аккаунт существует, код отправлен на почту' });
+});
+
+app.post('/api/reset-password', async (req, res) => {
+  const { email, code, newPassword } = req.body;
+  if (!email || !code || !newPassword) return res.status(400).json({ error: 'Заполните все поля' });
+  if (newPassword.length < 6) return res.status(400).json({ error: 'Пароль должен быть не менее 6 символов' });
+
+  const emailLower = email.toLowerCase();
+  const verification = db.prepare('SELECT * FROM email_verifications WHERE email = ?').get(emailLower);
+
+  if (!verification) return res.status(400).json({ error: 'Сначала запросите код' });
+  if (Date.now() > verification.expires_at) return res.status(400).json({ error: 'Код истёк. Запросите новый.' });
+  if (verification.attempts >= 5) return res.status(429).json({ error: 'Слишком много попыток. Запросите новый код.' });
+
+  if (verification.code !== String(code).trim()) {
+    db.prepare('UPDATE email_verifications SET attempts = attempts + 1 WHERE email = ?').run(emailLower);
+    const left = 5 - (verification.attempts + 1);
+    return res.status(400).json({ error: `Неверный код. Осталось попыток: ${left}` });
+  }
+
+  const user = db.prepare('SELECT id FROM users WHERE email = ?').get(emailLower);
+  if (!user) return res.status(404).json({ error: 'Пользователь не найден' });
+
+  const passwordHash = await bcrypt.hash(newPassword, BCRYPT_ROUNDS);
+  db.prepare('UPDATE users SET password_hash = ? WHERE id = ?').run(passwordHash, user.id);
+  db.prepare('DELETE FROM email_verifications WHERE email = ?').run(emailLower);
+
+  res.json({ ok: true, message: 'Пароль успешно изменён' });
 });
 
 // ─── Login ────────────────────────────────────────────────────────────────────
@@ -518,6 +635,24 @@ function adminAuthMiddleware(req, res, next) {
     return res.status(401).json({ error: 'Сессия истекла, войдите снова' });
   }
 }
+
+// Выдать Pro вручную по email (для админа)
+app.post('/api/admin/grant-pro', adminAuthMiddleware, (req, res) => {
+  const { email, days } = req.body;
+  if (!email) return res.status(400).json({ error: 'Укажите email' });
+
+  const user = db.prepare('SELECT id, plan, plan_expires_at FROM users WHERE email = ?').get(email.toLowerCase());
+  if (!user) return res.status(404).json({ error: 'Пользователь с таким email не найден' });
+
+  const durationDays = parseInt(days, 10) || 30;
+  const durationMs = durationDays * 24 * 60 * 60 * 1000;
+  const baseTime = user.plan === 'pro' && user.plan_expires_at > Date.now() ? user.plan_expires_at : Date.now();
+  const expiresAt = baseTime + durationMs;
+
+  db.prepare('UPDATE users SET plan = ?, plan_expires_at = ? WHERE id = ?').run('pro', expiresAt, user.id);
+
+  res.json({ ok: true, email: email.toLowerCase(), expiresAt, daysGranted: durationDays });
+});
 
 app.get('/api/admin/stats', adminAuthMiddleware, (req, res) => {
   const todayStart = new Date();
