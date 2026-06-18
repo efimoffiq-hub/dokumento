@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Создать документ — Документо</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%236366f1'/%3E%3Cstop offset='1' stop-color='%23a855f7'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='14' fill='url(%23g)'/%3E%3Ctext x='32' y='44' font-family='Arial,sans-serif' font-size='34' font-weight='800' fill='white' text-anchor='middle'%3E%D0%94%3C/text%3E%3C/svg%3E">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
@@ -54,7 +55,7 @@
 
     /* Tabs */
     .tabs { display: flex; gap: 6px; margin-bottom: 20px; background: var(--surface-2); padding: 4px; border-radius: 10px; }
-    .tab { flex: 1; padding: 9px 10px; border: none; border-radius: 8px; background: transparent; color: var(--text-muted); font-family: inherit; font-size: 0.82rem; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+    .tab { flex: 1; padding: 9px 6px; border: none; border-radius: 8px; background: transparent; color: var(--text-muted); font-family: inherit; font-size: 0.78rem; font-weight: 600; cursor: pointer; transition: all 0.2s; white-space: nowrap; }
     .tab:hover { color: var(--text); }
     .tab.is-active { background: var(--accent); color: #fff; box-shadow: 0 2px 12px var(--accent-glow); }
     .tab-panel { display: none; }
@@ -204,6 +205,7 @@
         <button type="button" class="tab is-active" data-tab="contract" role="tab">Договор</button>
         <button type="button" class="tab" data-tab="act" role="tab">Акт</button>
         <button type="button" class="tab" data-tab="kp" role="tab">КП</button>
+        <button type="button" class="tab" data-tab="partner" role="tab">Партнёрство</button>
       </div>
 
       <!-- Договор -->
@@ -410,7 +412,74 @@
         </form>
       </div>
 
-      <div class="form-error" id="generator-error"></div>
+      <!-- Партнёрство -->
+      <div class="tab-panel" id="panel-partner">
+        <form id="form-partner">
+          <div class="form-grid">
+            <div class="form-section-label">Стороны</div>
+            <div class="form-group">
+              <label for="p-executor">Ваше имя / ИП</label>
+              <input type="text" id="p-executor" name="executor" placeholder="Иванов Иван Иванович" required>
+            </div>
+            <div class="form-group">
+              <label for="p-executor-inn">ИНН</label>
+              <input type="text" id="p-executor-inn" name="executorInn" placeholder="123456789012" maxlength="12">
+            </div>
+            <div class="form-group">
+              <label for="p-partner">Партнёр</label>
+              <input type="text" id="p-partner" name="partner" placeholder="ООО «Ромашка» / Иванов И.И." required>
+            </div>
+            <div class="form-group">
+              <label for="p-partner-inn">ИНН партнёра</label>
+              <input type="text" id="p-partner-inn" name="partnerInn" placeholder="7701234567">
+            </div>
+            <div class="form-group">
+              <label for="p-city">Город заключения</label>
+              <input type="text" id="p-city" name="city" placeholder="Москва" required>
+            </div>
+            <div class="form-section-label">Условия партнёрства</div>
+            <div class="form-group full">
+              <label for="p-subject">Предмет сотрудничества</label>
+              <textarea id="p-subject" name="subject" placeholder="Привлечение клиентов на услуги разработки сайтов / совместная реализация проектов" required></textarea>
+            </div>
+            <div class="form-group">
+              <label for="p-percent">Доля партнёра, %</label>
+              <input type="number" id="p-percent" name="percent" placeholder="20" min="1" max="99" required>
+            </div>
+            <div class="form-group">
+              <label for="p-base">От чего считается %</label>
+              <input type="text" id="p-base" name="base" placeholder="от суммы оплаты клиента" required>
+            </div>
+            <div class="form-group full">
+              <label for="p-payterm">Срок выплаты доли</label>
+              <input type="text" id="p-payterm" name="payterm" placeholder="в течение 5 рабочих дней после получения оплаты от клиента" required>
+            </div>
+            <div class="form-section-label">Опции</div>
+            <div class="opt-group">
+              <label class="opt-toggle is-on" id="opt-p-report" data-opt="p-report">
+                <div class="opt-toggle-switch"></div>
+                <div class="opt-toggle-label">Отчётность<div class="opt-toggle-desc">Ежемесячный отчёт о привлечённых сделках</div></div>
+              </label>
+              <label class="opt-toggle is-on" id="opt-p-exclusive" data-opt="p-exclusive">
+                <div class="opt-toggle-switch"></div>
+                <div class="opt-toggle-label">Неконкуренция<div class="opt-toggle-desc">Партнёр не работает с конкурентами напрямую</div></div>
+              </label>
+              <label class="opt-toggle is-on" id="opt-p-term" data-opt="p-term">
+                <div class="opt-toggle-switch"></div>
+                <div class="opt-toggle-label">Срок действия и расторжение<div class="opt-toggle-desc">Срок договора и уведомление о выходе</div></div>
+              </label>
+              <div class="opt-field is-visible" id="field-p-term">
+                <div class="form-group"><label for="p-duration">Срок действия</label><input type="text" id="p-duration" name="duration" placeholder="1 год с автопродлением"></div>
+                <div class="form-group"><label for="p-notice">Уведомление о выходе</label><input type="text" id="p-notice" name="notice" placeholder="30 дней"></div>
+              </div>
+              <label class="opt-toggle" id="opt-p-penalty" data-opt="p-penalty">
+                <div class="opt-toggle-switch"></div>
+                <div class="opt-toggle-label">Пеня за просрочку выплаты<div class="opt-toggle-desc">0,1% в день за задержку доли</div></div>
+              </label>
+            </div>
+          </div>
+        </form>
+      </div>
       <button type="button" class="btn btn-primary btn-generate" id="btn-generate">Сгенерировать документ →</button>
     </div>
 
@@ -667,6 +736,8 @@
       if (activeTab === 'contract') {
         lastContractData = data;
         saveRequisites(data.executor, data.city, data.executorInn, data.executorContact);
+      } else if (activeTab === 'partner') {
+        saveRequisites(data.executor, data.city, data.executorInn, '');
       } else if (data.executor) {
         saveRequisites(data.executor, '', '', data.contact || '');
       }
@@ -697,6 +768,7 @@
         var html;
         if (activeTab === 'contract') html = buildContract(data);
         else if (activeTab === 'act') html = buildAct(data);
+        else if (activeTab === 'partner') html = buildPartner(data);
         else html = buildKp(data);
 
         lastGeneratedTab = activeTab;
@@ -704,7 +776,7 @@
         document.getElementById('result-placeholder').style.display = 'none';
         document.getElementById('result-content').classList.add('is-visible');
 
-        var titles = { contract: 'Договор готов ✓', act: 'Акт готов ✓', kp: 'КП готово ✓' };
+        var titles = { contract: 'Договор готов ✓', act: 'Акт готов ✓', kp: 'КП готово ✓', partner: 'Договор готов ✓' };
         document.getElementById('result-title').textContent = titles[activeTab] || 'Документ готов ✓';
 
         // Кнопка создать акт
@@ -857,6 +929,67 @@
         +processBlock+guaranteeBlock+legalBlock+validBlock
         +'<p style="margin-top:18px">Готов приступить после согласования. Пишите — отвечу быстро.</p>'
         +'<div class="doc-kp-footer"><div><strong>'+esc(d.executor)+'</strong><br>Исполнитель, самозанятый'+(d.contact?'<br>'+esc(d.contact):'')+'</div><div style="text-align:right">'+dateStr+'</div></div>';
+    }
+
+    function buildPartner(d) {
+      var num=docNum();
+      var innExec=d.executorInn?', ИНН '+esc(d.executorInn):'';
+      var innPartner=d.partnerInn?', ИНН '+esc(d.partnerInn):'';
+      var reportOn=document.getElementById('opt-p-report')&&document.getElementById('opt-p-report').classList.contains('is-on');
+      var exclusiveOn=document.getElementById('opt-p-exclusive')&&document.getElementById('opt-p-exclusive').classList.contains('is-on');
+      var termOn=document.getElementById('opt-p-term')&&document.getElementById('opt-p-term').classList.contains('is-on');
+      var penaltyOn=document.getElementById('opt-p-penalty')&&document.getElementById('opt-p-penalty').classList.contains('is-on');
+
+      var reportBlock=reportOn?'<p>3.3. Сторона, привлекающая клиентов/сделки, ежемесячно направляет другой Стороне отчёт о совершённых сделках, подлежащих учёту по настоящему Договору, не позднее 5-го числа месяца, следующего за отчётным.</p>':'';
+      var exclusiveBlock=exclusiveOn?'<div class="doc-section"><h2>5. Неконкуренция</h2><p>В течение срока действия настоящего Договора Партнёр не вправе предлагать аналогичные услуги напрямую клиентам, привлечённым в рамках настоящего сотрудничества, минуя другую Сторону.</p></div>':'';
+
+      var termBlock='';
+      var sNum=5+(exclusiveOn?1:0);
+      if(termOn){
+        var duration=d.duration?esc(d.duration):'1 год с момента подписания, с автоматическим продлением на тот же срок, если ни одна из Сторон не уведомила об отказе от продления';
+        var notice=d.notice?esc(d.notice):'30 дней';
+        termBlock='<div class="doc-section"><h2>'+sNum+'. Срок действия и расторжение</h2>'
+          +'<p>'+sNum+'.1. Договор действует: '+duration+'.</p>'
+          +'<p>'+sNum+'.2. Любая из Сторон может расторгнуть Договор, уведомив другую Сторону письменно не менее чем за '+notice+' до даты прекращения. Обязательства по выплате доли за уже совершённые сделки сохраняются после расторжения.</p>'
+          +'</div>';
+        sNum++;
+      }
+
+      var penaltyBlock=penaltyOn?'<div class="doc-section"><h2>'+sNum+'. Ответственность</h2><p>'+sNum+'.1. За нарушение срока выплаты доли Партнёру начисляется пеня в размере 0,1% от причитающейся суммы за каждый день просрочки.</p></div>':'';
+      if(penaltyOn)sNum++;
+
+      return '<div class="doc-header"><h1>Договор о партнёрстве</h1><div class="doc-num">№ '+num+'</div></div>'
+        +'<div class="doc-meta">г. '+esc(d.city)+', '+dateStr+'</div>'
+        +'<div class="doc-parties"><p><strong>'+esc(d.executor)+'</strong>'+innExec+', далее «Сторона 1», и</p>'
+        +'<p><strong>'+esc(d.partner)+'</strong>'+innPartner+', далее «Партнёр» (Сторона 2), совместно — «Стороны», заключили Договор:</p></div>'
+        +'<div class="doc-section"><h2>1. Предмет договора</h2>'
+        +'<p>1.1. Стороны договорились о сотрудничестве в рамках: <strong>'+esc(d.subject)+'</strong>.</p>'
+        +'<p>1.2. Настоящий Договор регулирует порядок взаимодействия Сторон и порядок распределения дохода от совместной деятельности либо привлечённых сделок.</p>'
+        +'</div>'
+        +'<div class="doc-section"><h2>2. Распределение дохода</h2>'
+        +'<p>2.1. Партнёру причитается <strong>'+esc(d.percent)+'%</strong> '+esc(d.base)+'.</p>'
+        +'<p>2.2. Расчёт доли производится от суммы, фактически полученной Стороной 1, без учёта налогов, удерживаемых при получении дохода.</p>'
+        +'</div>'
+        +'<div class="doc-section"><h2>3. Порядок выплаты</h2>'
+        +'<p>3.1. Выплата доли Партнёру производится: '+esc(d.payterm)+'.</p>'
+        +'<p>3.2. Выплата производится безналичным переводом на реквизиты, указанные Партнёром.</p>'
+        +reportBlock
+        +'</div>'
+        +'<div class="doc-section"><h2>4. Права и обязанности сторон</h2>'
+        +'<p>4.1. Сторона 1 обязуется добросовестно информировать Партнёра о статусе сделок, подлежащих учёту по настоящему Договору.</p>'
+        +'<p>4.2. Партнёр обязуется действовать в интересах Сторон и не предоставлять заведомо ложную информацию о привлечённых клиентах или сделках.</p>'
+        +'</div>'
+        +exclusiveBlock
+        +termBlock
+        +penaltyBlock
+        +'<div class="doc-section"><h2>'+sNum+'. Заключительные положения</h2>'
+        +'<p>'+sNum+'.1. Договор составлен в двух экземплярах, имеющих равную юридическую силу. Изменения действительны только в письменной форме.</p>'
+        +'<p>'+sNum+'.2. Споры разрешаются переговорами, при недостижении согласия — в суде по месту нахождения Стороны 1.</p>'
+        +'</div>'
+        +'<div class="doc-signatures">'
+        +'<div class="doc-sig-block"><p><strong>Сторона 1:</strong></p><p>'+esc(d.executor)+(d.executorInn?'<br>ИНН: '+esc(d.executorInn):'')+'</p><div class="doc-sig-line"></div><p>подпись / дата</p></div>'
+        +'<div class="doc-sig-block"><p><strong>Партнёр:</strong></p><p>'+esc(d.partner)+(d.partnerInn?'<br>ИНН: '+esc(d.partnerInn):'')+'</p><div class="doc-sig-line"></div><p>подпись / дата</p></div>'
+        +'</div>';
     }
 
     // === AUTH ===
