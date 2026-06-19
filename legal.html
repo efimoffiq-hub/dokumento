@@ -3,373 +3,144 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Тарифы, оферта и контакты — Документо</title>
+  <title>Пользовательское соглашение — Документо</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
-    *, *::before, *::after {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
-    :root {
-      --bg: #0a0a0f;
-      --surface: #13131a;
-      --surface-2: #1c1c26;
-      --border: rgba(255, 255, 255, 0.08);
-      --text: #f4f4f5;
-      --text-muted: #a1a1aa;
-      --accent: #6366f1;
-      --accent-light: #818cf8;
-      --accent-glow: rgba(99, 102, 241, 0.35);
-      --radius: 12px;
-      --radius-lg: 20px;
-    }
-
-    body {
-      font-family: 'Inter', system-ui, -apple-system, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      line-height: 1.7;
-      -webkit-font-smoothing: antialiased;
-    }
-
-    .container {
-      max-width: 800px;
-      margin: 0 auto;
-      padding: 0 24px;
-    }
-
-    header {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      z-index: 100;
-      background: rgba(10, 10, 15, 0.8);
-      backdrop-filter: blur(16px);
-      border-bottom: 1px solid var(--border);
-    }
-
-    .header-inner {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      height: 64px;
-    }
-
-    .logo {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-weight: 700;
-      font-size: 1.15rem;
-      text-decoration: none;
-      color: var(--text);
-    }
-
-    .logo-icon {
-      width: 32px;
-      height: 32px;
-      background: linear-gradient(135deg, var(--accent), #a855f7);
-      border-radius: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 0.85rem;
-    }
-
-    .back-link {
-      color: var(--text-muted);
-      text-decoration: none;
-      font-size: 0.9rem;
-      font-weight: 500;
-      transition: color 0.2s;
-    }
-
-    .back-link:hover {
-      color: var(--text);
-    }
-
-    main {
-      padding: 120px 0 80px;
-    }
-
-    .page-title {
-      font-size: clamp(1.8rem, 4vw, 2.4rem);
-      font-weight: 800;
-      letter-spacing: -0.03em;
-      margin-bottom: 12px;
-    }
-
-    .page-desc {
-      color: var(--text-muted);
-      margin-bottom: 48px;
-    }
-
-    .legal-section {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-lg);
-      padding: 32px;
-      margin-bottom: 24px;
-    }
-
-    .legal-section h2 {
-      font-size: 1.25rem;
-      font-weight: 700;
-      margin-bottom: 20px;
-      color: var(--accent-light);
-    }
-
-    .legal-section h3 {
-      font-size: 1rem;
-      font-weight: 600;
-      margin: 20px 0 8px;
-    }
-
-    .legal-section p {
-      color: var(--text-muted);
-      margin-bottom: 12px;
-    }
-
-    .legal-section p:last-child {
-      margin-bottom: 0;
-    }
-
-    .legal-section ul {
-      color: var(--text-muted);
-      margin: 0 0 12px 20px;
-    }
-
-    .legal-section li {
-      margin-bottom: 6px;
-    }
-
-    .pricing-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-      gap: 16px;
-      margin-top: 8px;
-    }
-
-    .pricing-card {
-      background: var(--surface-2);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 24px;
-    }
-
-    .pricing-card.featured {
-      border-color: rgba(99, 102, 241, 0.4);
-      box-shadow: 0 0 24px var(--accent-glow);
-    }
-
-    .pricing-name {
-      font-size: 1.1rem;
-      font-weight: 700;
-      margin-bottom: 8px;
-    }
-
-    .pricing-price {
-      font-size: 1.6rem;
-      font-weight: 800;
-      color: var(--accent-light);
-      margin-bottom: 12px;
-    }
-
-    .pricing-price span {
-      font-size: 0.9rem;
-      font-weight: 500;
-      color: var(--text-muted);
-    }
-
-    .pricing-features {
-      list-style: none;
-      margin: 0;
-      padding: 0;
-    }
-
-    .pricing-features li {
-      font-size: 0.9rem;
-      color: var(--text-muted);
-      padding-left: 20px;
-      position: relative;
-      margin-bottom: 8px;
-    }
-
-    .pricing-features li::before {
-      content: '✓';
-      position: absolute;
-      left: 0;
-      color: var(--accent-light);
-      font-weight: 700;
-    }
-
-    .contacts-list {
-      list-style: none;
-      margin: 0;
-      padding: 0;
-    }
-
-    .contacts-list li {
-      margin-bottom: 10px;
-      color: var(--text-muted);
-    }
-
-    .contacts-list strong {
-      color: var(--text);
-      font-weight: 600;
-    }
-
-    .contacts-list a {
-      color: var(--accent-light);
-      text-decoration: none;
-    }
-
-    .contacts-list a:hover {
-      text-decoration: underline;
-    }
-
-    footer {
-      padding: 32px 0;
-      border-top: 1px solid var(--border);
-    }
-
-    .footer-inner {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 16px;
-    }
-
-    .footer-copy {
-      font-size: 0.85rem;
-      color: var(--text-muted);
-    }
-
-    .footer-links {
-      display: flex;
-      gap: 24px;
-    }
-
-    .footer-links a {
-      font-size: 0.85rem;
-      color: var(--text-muted);
-      text-decoration: none;
-      transition: color 0.2s;
-    }
-
-    .footer-links a:hover {
-      color: var(--text);
-    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root { --bg: #0a0a0f; --surface: #13131a; --border: rgba(255,255,255,0.08); --text: #f4f4f5; --text-muted: #a1a1aa; --accent: #6366f1; --accent-light: #818cf8; --radius-lg: 20px; }
+    body { font-family: 'Inter', system-ui, sans-serif; background: var(--bg); color: var(--text); line-height: 1.7; -webkit-font-smoothing: antialiased; }
+    .container { max-width: 800px; margin: 0 auto; padding: 0 24px; }
+    header { position: fixed; top: 0; left: 0; right: 0; z-index: 100; background: rgba(10,10,15,0.8); backdrop-filter: blur(16px); border-bottom: 1px solid var(--border); }
+    .header-inner { display: flex; align-items: center; justify-content: space-between; height: 64px; }
+    .logo { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 1rem; text-decoration: none; color: var(--text); }
+    .logo-icon { width: 28px; height: 28px; background: linear-gradient(135deg, var(--accent), #a855f7); border-radius: 7px; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; }
+    .back-link { color: var(--text-muted); text-decoration: none; font-size: 0.88rem; font-weight: 500; transition: color 0.2s; }
+    .back-link:hover { color: var(--text); }
+    main { padding: 110px 0 80px; }
+    .page-title { font-size: clamp(1.6rem, 4vw, 2.2rem); font-weight: 800; letter-spacing: -0.03em; margin-bottom: 10px; }
+    .page-desc { color: var(--text-muted); margin-bottom: 40px; font-size: 0.9rem; }
+    .legal-section { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 28px 32px; margin-bottom: 20px; }
+    .legal-section h2 { font-size: 1.1rem; font-weight: 700; margin-bottom: 14px; color: var(--accent-light); }
+    .legal-section p { color: var(--text-muted); margin-bottom: 10px; font-size: 0.9rem; }
+    .legal-section p:last-child { margin-bottom: 0; }
+    .legal-section ul { color: var(--text-muted); margin: 0 0 10px 20px; font-size: 0.9rem; }
+    .legal-section li { margin-bottom: 5px; }
+    .legal-section a { color: var(--accent-light); text-decoration: none; }
+    .legal-section a:hover { text-decoration: underline; }
+    .tariff-table { width: 100%; border-collapse: collapse; margin-top: 12px; font-size: 0.88rem; }
+    .tariff-table th { text-align: left; padding: 10px 12px; color: var(--text-muted); font-weight: 600; border-bottom: 1px solid var(--border); }
+    .tariff-table td { padding: 10px 12px; color: var(--text-muted); border-bottom: 1px solid var(--border); }
+    .tariff-table tr:last-child td { border-bottom: none; }
+    .tariff-table td:first-child { color: var(--text); font-weight: 500; }
+    footer { padding: 28px 0; border-top: 1px solid var(--border); }
+    .footer-inner { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+    .footer-copy { font-size: 0.82rem; color: var(--text-muted); }
+    .footer-links { display: flex; gap: 20px; }
+    .footer-links a { font-size: 0.82rem; color: var(--text-muted); text-decoration: none; transition: color 0.2s; }
+    .footer-links a:hover { color: var(--text); }
   </style>
 </head>
 <body>
-
   <header>
     <div class="container header-inner">
-      <a href="index.html" class="logo">
-        <div class="logo-icon">Д</div>
-        Документо
-      </a>
+      <a href="index.html" class="logo"><div class="logo-icon">Д</div>Документо</a>
       <a href="index.html" class="back-link">← На главную</a>
     </div>
   </header>
 
   <main>
     <div class="container">
-      <h1 class="page-title">Правовая информация</h1>
-      <p class="page-desc">Тарифы, условия оказания услуг, публичная оферта и контактные данные исполнителя.</p>
+      <h1 class="page-title">Пользовательское соглашение</h1>
+      <p class="page-desc">Публичная оферта на оказание услуг сервиса «Документо». Редакция от 18 июня 2026 г.</p>
 
-      <section class="legal-section" id="tariffs">
-        <h2>1. Тарифы и цены</h2>
-        <div class="pricing-grid">
-          <div class="pricing-card">
-            <div class="pricing-name">Бесплатный план</div>
-            <div class="pricing-price">0 ₽ <span>/ месяц</span></div>
-            <ul class="pricing-features">
-              <li>3 документа в месяц</li>
-              <li>Договоры, акты и КП</li>
-              <li>Скачивание в PDF</li>
-            </ul>
-          </div>
-          <div class="pricing-card featured">
-            <div class="pricing-name">Про план</div>
-            <div class="pricing-price">499 ₽ <span>/ месяц</span></div>
-            <ul class="pricing-features">
-              <li>Безлимитные документы</li>
-              <li>Все типы документов</li>
-              <li>Приоритетная поддержка</li>
-            </ul>
-          </div>
-        </div>
+      <section class="legal-section">
+        <h2>1. Общие положения</h2>
+        <p>1.1. Настоящее Пользовательское соглашение (далее — Соглашение) является публичной офертой (ст. 437 ГК РФ) Ефимова Алексея Олеговича, самозанятого (ИНН указан в реквизитах), далее — «Исполнитель», адресованной любому физическому или юридическому лицу (далее — «Пользователь»).</p>
+        <p>1.2. Использование сервиса «Документо» (далее — Сервис), расположенного по адресу <a href="https://mydokumento.ru">mydokumento.ru</a>, означает полное и безоговорочное принятие условий настоящего Соглашения (акцепт оферты, ст. 438 ГК РФ).</p>
+        <p>1.3. Если Пользователь не согласен с условиями Соглашения, он обязан немедленно прекратить использование Сервиса.</p>
       </section>
 
-      <section class="legal-section" id="order">
-        <h2>2. Как получить заказ</h2>
-        <p>После оплаты доступ к выбранному тарифному плану открывается автоматически в личном кабинете на сайте dokumento.</p>
-        <p>Все документы генерируются онлайн и становятся доступны сразу после оформления подписки или регистрации. Дополнительных действий для активации доступа не требуется.</p>
-        <p>Оплата производится через платёжные системы, доступные на сайте. Моментом оплаты считается поступление денежных средств на расчётный счёт исполнителя.</p>
+      <section class="legal-section">
+        <h2>2. Предмет соглашения</h2>
+        <p>2.1. Исполнитель предоставляет Пользователю доступ к онлайн-инструменту для автоматизированной генерации шаблонов юридических документов: договоров оказания услуг, актов оказанных услуг, коммерческих предложений, договоров о партнёрстве (далее — «Документы»).</p>
+        <p>2.2. Сервис предоставляет готовые шаблоны, заполненные данными Пользователя. Исполнитель не оказывает юридических консультационных услуг и не несёт ответственности за правовые последствия использования сгенерированных Документов.</p>
+        <p>2.3. Пользователь самостоятельно несёт ответственность за достоверность введённых данных и соответствие Документа условиям конкретной сделки.</p>
       </section>
 
-      <section class="legal-section" id="oferta">
-        <h2>3. Публичная оферта</h2>
-        <p>Настоящий документ является официальным предложением (публичной офертой) Ефимова Алексея Олеговича (далее — Исполнитель) заключить договор на оказание информационных услуг с любым физическим лицом (далее — Заказчик) на условиях, изложенных ниже.</p>
-
-        <h3>3.1. Предмет договора</h3>
-        <p>Исполнитель обязуется предоставить Заказчику доступ к онлайн-сервису «Документо» для автоматизированной генерации документов (договоров, актов, коммерческих предложений), а Заказчик обязуется оплатить услуги в соответствии с выбранным тарифным планом.</p>
-
-        <h3>3.2. Порядок заключения договора</h3>
-        <p>Договор считается заключённым с момента акцепта оферты Заказчиком. Акцептом оферты является регистрация на сайте, оплата услуг или фактическое использование сервиса.</p>
-
-        <h3>3.3. Стоимость услуг</h3>
-        <p>Стоимость услуг определяется тарифами, размещёнными в разделе «Тарифы и цены» настоящей страницы. Исполнитель вправе изменять тарифы, уведомив Заказчика путём публикации новых условий на сайте.</p>
-
-        <h3>3.4. Порядок оказания услуг</h3>
-        <p>Услуги оказываются в электронном виде через сеть Интернет. Доступ к функционалу сервиса предоставляется после регистрации и/или оплаты в соответствии с выбранным тарифом.</p>
-
-        <h3>3.5. Права и обязанности сторон</h3>
-        <p>Исполнитель обязуется обеспечить работоспособность сервиса и предоставить Заказчику доступ к заявленному функционалу. Заказчик обязуется предоставлять достоверные данные при регистрации и не использовать сервис в противоправных целях.</p>
-
-        <h3>3.6. Ответственность</h3>
-        <p>Исполнитель не несёт ответственности за содержание документов, сгенерированных Заказчиком, и рекомендует проверять их перед использованием. Сервис предоставляет шаблоны информационного характера и не заменяет профессиональную юридическую консультацию.</p>
-
-        <h3>3.7. Возврат средств</h3>
-        <p>Возврат оплаты за неоказанные услуги осуществляется в соответствии с законодательством Российской Федерации о защите прав потребителей. Для оформления возврата Заказчик направляет обращение на контактный email Исполнителя.</p>
-
-        <h3>3.8. Заключительные положения</h3>
-        <p>К отношениям сторон применяется законодательство Российской Федерации. Все споры разрешаются путём переговоров, а при недостижении согласия — в судебном порядке по месту нахождения Исполнителя.</p>
+      <section class="legal-section">
+        <h2>3. Тарифы и условия подписки</h2>
+        <table class="tariff-table">
+          <thead>
+            <tr><th>Тариф</th><th>Цена</th><th>Документов</th><th>Условия</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Бесплатный (Free)</td><td>0 ₽</td><td>3 в месяц</td><td>Без ограничений по времени</td></tr>
+            <tr><td>Pro</td><td>499 ₽/месяц</td><td>Безлимит</td><td>Подписка на 30 дней с момента оплаты</td></tr>
+            <tr><td>Бизнес</td><td>1 990 ₽/месяц</td><td>Безлимит</td><td>Для команд — по запросу</td></tr>
+          </tbody>
+        </table>
+        <p style="margin-top:14px">3.1. Подписка Pro активируется автоматически после успешной оплаты и действует 30 (тридцать) календарных дней с момента её активации.</p>
+        <p>3.2. Подписка не продлевается автоматически. По истечении срока доступ переходит на тарифный план «Бесплатный».</p>
+        <p>3.3. Оплата производится через платёжный сервис ЮKassa (ООО «ЮМани»). Исполнитель не хранит данные банковских карт Пользователей.</p>
+        <p>3.4. Все цены указаны в рублях РФ и включают все применимые налоги. Исполнитель применяет специальный налоговый режим «Налог на профессиональный доход» (ФЗ № 422-ФЗ от 27.11.2018), НДС не облагается.</p>
       </section>
 
-      <section class="legal-section" id="contacts">
-        <h2>4. Контакты и реквизиты</h2>
-        <ul class="contacts-list">
-          <li><strong>ФИО:</strong> Ефимов Алексей Олегович</li>
-          <li><strong>ИНН:</strong> 026829849907</li>
-          <li><strong>Email:</strong> <a href="mailto:efimoff.iq@gmail.com">efimoff.iq@gmail.com</a></li>
-          <li><strong>Статус:</strong> Самозанятый</li>
-        </ul>
+      <section class="legal-section">
+        <h2>4. Возврат денежных средств</h2>
+        <p>4.1. Пользователь вправе потребовать возврата оплаты в течение 14 (четырнадцати) календарных дней с момента оплаты при условии, что за этот период он не генерировал Документы в рамках тарифа Pro (п. 26.1 Закона РФ «О защите прав потребителей» применяется с учётом специфики цифровых услуг).</p>
+        <p>4.2. Для оформления возврата Пользователь направляет запрос на email: <a href="mailto:efimoff.iq@gmail.com">efimoff.iq@gmail.com</a> с темой «Возврат» и указанием email аккаунта и даты оплаты.</p>
+        <p>4.3. Возврат осуществляется в течение 10 рабочих дней на карту/счёт, с которого производилась оплата. При возврате подписка Pro деактивируется.</p>
+      </section>
+
+      <section class="legal-section">
+        <h2>5. Права и обязанности сторон</h2>
+        <p>5.1. Исполнитель обязуется обеспечивать работоспособность Сервиса и доступность функционала в соответствии с оплаченным тарифом.</p>
+        <p>5.2. Исполнитель вправе изменять функционал Сервиса, тарифы и условия Соглашения, уведомив Пользователей не менее чем за 14 дней путём размещения информации на сайте.</p>
+        <p>5.3. Пользователь обязуется: не использовать Сервис в незаконных целях; не осуществлять попыток несанкционированного доступа к Сервису; предоставлять достоверные данные при регистрации.</p>
+        <p>5.4. Пользователь вправе в любой момент удалить свой аккаунт, направив запрос на <a href="mailto:efimoff.iq@gmail.com">efimoff.iq@gmail.com</a>.</p>
+      </section>
+
+      <section class="legal-section">
+        <h2>6. Ограничение ответственности</h2>
+        <p>6.1. Сервис предоставляется «как есть» (as is). Исполнитель не гарантирует юридическую применимость сгенерированных Документов к конкретным правоотношениям Пользователя.</p>
+        <p>6.2. Исполнитель не несёт ответственности за убытки Пользователя, возникшие в результате использования или невозможности использования Сервиса, в том числе за потерянную прибыль и косвенные убытки.</p>
+        <p>6.3. Суммарная ответственность Исполнителя перед Пользователем по всем основаниям ограничена суммой, фактически уплаченной Пользователем за соответствующий период подписки.</p>
+      </section>
+
+      <section class="legal-section">
+        <h2>7. Интеллектуальная собственность</h2>
+        <p>7.1. Все шаблоны, алгоритмы и интерфейс Сервиса являются интеллектуальной собственностью Исполнителя и защищены законодательством РФ об авторском праве.</p>
+        <p>7.2. Пользователю предоставляется неисключительная лицензия на использование сгенерированных Документов исключительно для собственных нужд.</p>
+      </section>
+
+      <section class="legal-section">
+        <h2>8. Разрешение споров</h2>
+        <p>8.1. Все споры разрешаются путём переговоров. Срок ответа на претензию — 10 рабочих дней.</p>
+        <p>8.2. При недостижении согласия спор передаётся в суд общей юрисдикции по месту нахождения Исполнителя в соответствии с законодательством РФ.</p>
+        <p>8.3. К настоящему Соглашению применяется право Российской Федерации.</p>
+      </section>
+
+      <section class="legal-section">
+        <h2>9. Реквизиты исполнителя</h2>
+        <p>Ефимов Алексей Олегович<br>
+        Статус: самозанятый (плательщик НПД)<br>
+        Email: <a href="mailto:efimoff.iq@gmail.com">efimoff.iq@gmail.com</a><br>
+        Telegram: <a href="https://t.me/ogcut" target="_blank">@ogcut</a><br>
+        Сайт: <a href="https://mydokumento.ru">mydokumento.ru</a></p>
       </section>
     </div>
   </main>
 
   <footer>
     <div class="container footer-inner">
-      <a href="index.html" class="logo">
-        <div class="logo-icon">Д</div>
-        Документо
-      </a>
+      <a href="index.html" class="logo"><div class="logo-icon">Д</div>Документо</a>
       <p class="footer-copy">© 2026 Документо. Все права защищены.</p>
       <div class="footer-links">
         <a href="index.html">Главная</a>
-        <a href="legal.html">Правовая информация</a>
+        <a href="privacy.html">Конфиденциальность</a>
       </div>
     </div>
   </footer>
-
 </body>
 </html>
