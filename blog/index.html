@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Блог — Документо</title>
+  <meta name="description" content="Полезные статьи для фрилансеров и самозанятых: договоры, акты, КП, защита от неплательщиков.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .blog-header { margin-bottom: 48px; }
+    .blog-header h1 { font-size: clamp(1.8rem, 4vw, 2.4rem); font-weight: 800; letter-spacing: -0.03em; margin-bottom: 10px; }
+    .blog-header p { color: var(--text-muted); font-size: 1rem; }
+    .articles-grid { display: flex; flex-direction: column; gap: 16px; }
+    .article-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 24px 28px; text-decoration: none; color: inherit; display: block; transition: border-color 0.2s, transform 0.15s; }
+    .article-card:hover { border-color: rgba(99,102,241,0.4); transform: translateY(-2px); }
+    .article-card .tag { font-size: 0.72rem; font-weight: 700; color: var(--accent-light); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 8px; }
+    .article-card h2 { font-size: 1.1rem; font-weight: 700; margin-bottom: 8px; line-height: 1.3; }
+    .article-card p { font-size: 0.88rem; color: var(--text-muted); line-height: 1.6; margin: 0; }
+    .article-card .meta { font-size: 0.78rem; color: var(--text-muted); margin-top: 14px; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container header-inner">
+      <a href="../index.html" class="logo"><div class="logo-icon">Д</div>Документо</a>
+      <a href="../index.html" class="back-link">← На главную</a>
+    </div>
+  </header>
+
+  <main>
+    <div class="container">
+      <div class="blog-header">
+        <h1>Блог</h1>
+        <p>Полезные статьи для фрилансеров и самозанятых</p>
+      </div>
+
+      <div class="articles-grid">
+        <a href="akt-okazannyh-uslug-dlya-samozanyatogo.html" class="article-card">
+          <div class="tag">Документы</div>
+          <h2>Акт оказанных услуг для самозанятого — образец 2026</h2>
+          <p>Зачем нужен акт, что в него включить и как подписать дистанционно. Почему чека из «Мой налог» недостаточно.</p>
+          <div class="meta">18 июня 2026 · 5 мин</div>
+        </a>
+
+        <a href="kommercheskoe-predlozhenie-dlya-frilansera.html" class="article-card">
+          <div class="tag">Документы</div>
+          <h2>Коммерческое предложение для фрилансера — как составить</h2>
+          <p>Структура КП которое продаёт, что писать и что не писать, как указать статус самозанятого.</p>
+          <div class="meta">18 июня 2026 · 4 мин</div>
+        </a>
+
+        <a href="chto-delat-esli-klient-ne-platit.html" class="article-card">
+          <div class="tag">Советы</div>
+          <h2>Что делать если клиент не платит — инструкция для самозанятого</h2>
+          <p>Пошаговый план: напоминание, досудебная претензия, суд. Почему всё это работает только с договором.</p>
+          <div class="meta">18 июня 2026 · 5 мин</div>
+        </a>
+
+        <a href="dogovor-s-fizlicom-dlya-samozanyatogo.html" class="article-card">
+          <div class="tag">Документы</div>
+          <h2>Договор с физлицом для самозанятого — как оформить правильно</h2>
+          <p>Чем отличается от договора с компанией, что обязательно прописать и как убедить клиента его подписать.</p>
+          <div class="meta">18 июня 2026 · 4 мин</div>
+        </a>
+
+        <a href="nda-dlya-frilansera.html" class="article-card">
+          <div class="tag">Советы</div>
+          <h2>NDA для фрилансера — что это и когда нужен</h2>
+          <p>Когда нужно соглашение о неразглашении, что прописать и почему NDA защищает не только клиента.</p>
+          <div class="meta">18 июня 2026 · 4 мин</div>
+        </a>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <div class="container footer-inner">
+      <a href="../index.html" class="logo"><div class="logo-icon">Д</div>Документо</a>
+      <p class="footer-copy">© 2026 Документо</p>
+      <div class="footer-links">
+        <a href="../legal.html">Соглашение</a>
+        <a href="../privacy.html">Конфиденциальность</a>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>
